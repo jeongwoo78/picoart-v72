@@ -1,5 +1,5 @@
-// PicoArt v71 - ResultScreen (displayConfig 기반)
-// v71: displayConfig.js 컨트롤 타워 사용
+// PicoArt v72 - ResultScreen (3줄 형식)
+// v72: displayConfig.js 3줄 형식 컨트롤 타워 사용
 
 import React, { useState, useEffect, useRef } from 'react';
 import BeforeAfter from './BeforeAfter';
@@ -14,8 +14,8 @@ import { oneclickMastersSecondary } from '../data/oneclickMastersEducation';
 import { oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
 import { saveToGallery } from './GalleryScreen';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
-// v71: displayConfig 컨트롤 타워
-import { normalizeKey, getDisplayInfo, getArtistName } from '../utils/displayConfig';
+// v72: displayConfig 3줄 형식 컨트롤 타워
+import { normalizeKey, getThreeLineDisplay, getArtistName } from '../utils/displayConfig';
 import { getEducationKey } from '../utils/educationMatcher';
 
 
@@ -2000,62 +2000,39 @@ const ResultScreen = ({
         {showInfo && (
           <div className="technique-card">
             
-            {/* Card Header */}
+            {/* Card Header - v72: 3줄 형식 */}
             <div className="card-header">
               <div className="technique-icon">
                 {isFullTransform ? (currentResult?.style?.icon || '🎨') : (selectedStyle.icon || '🎨')}
               </div>
-              <div>
-                <h2>
-                  {/* v67: 새 표기 형식 - 제목 */}
-                  {/* 거장: 풀네임(영문, 생몰연도) */}
-                  {/* 미술사조: 사조(영문, 시기) */}
-                  {/* 동양화: 국가 전통회화 */}
-                  {(() => {
-                    const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
-                    const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
-                    
-                    if (category === 'masters') {
-                      // API 실패 시 selectedStyle.name 사용
-                      const artistForDisplay = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
-                      const masterInfo = getMasterInfo(artistForDisplay);
-                      return masterInfo.fullName;
-                    } else if (category === 'movements') {
-                      const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
-                      return movementInfo.title;
-                    } else if (category === 'oriental') {
-                      const orientalInfo = getOrientalDisplayInfo(displayArtist);
-                      return orientalInfo.title;
-                    }
-                    return styleName;
-                  })()}
-                </h2>
-                <p className="technique-subtitle">
-                  <span className="artist-name">
-                    {/* v67: 새 표기 형식 - 부제 */}
-                    {/* 거장: 사조(시기) */}
-                    {/* 미술사조: 화가명(생몰연도) */}
-                    {/* 동양화: 스타일(영문) */}
-                    {(() => {
-                      const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
-                      const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
-                      
-                      if (category === 'masters') {
-                        // API 실패 시 selectedStyle.name 사용
-                        const artistForDisplay = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
-                        const masterInfo = getMasterInfo(artistForDisplay);
-                        return masterInfo.movement || '거장';
-                      } else if (category === 'movements') {
-                        const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
-                        return movementInfo.subtitle;
-                      } else if (category === 'oriental') {
-                        const orientalInfo = getOrientalDisplayInfo(displayArtist);
-                        return orientalInfo.subtitle;
-                      }
-                      return formatArtistName(displayArtist);
-                    })()}
-                  </span>
-                </p>
+              <div className="three-line-display">
+                {/* v72: 3줄 형식 - displayConfig 사용 */}
+                {(() => {
+                  const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
+                  const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
+                  const styleId = isFullTransform ? (currentResult?.style?.id || currentResult?.style?.name) : (selectedStyle.id || selectedStyle.name);
+                  
+                  let threeLines = { line1: styleName, line2: '', line3: '' };
+                  
+                  if (category === 'masters') {
+                    const artistKey = displayArtist || styleId;
+                    threeLines = getThreeLineDisplay('masters', artistKey);
+                  } else if (category === 'movements') {
+                    const artistKey = displayArtist ? normalizeKey(displayArtist) : null;
+                    threeLines = getThreeLineDisplay('movements', styleId, artistKey);
+                  } else if (category === 'oriental') {
+                    const artistKey = displayArtist || styleId;
+                    threeLines = getThreeLineDisplay('oriental', artistKey);
+                  }
+                  
+                  return (
+                    <>
+                      <h2 className="line1">{threeLines.line1}</h2>
+                      <p className="line2">{threeLines.line2}</p>
+                      <p className="line3">{threeLines.line3}</p>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
@@ -2298,6 +2275,32 @@ const ResultScreen = ({
           min-width: 3.5rem;
           flex-shrink: 0;
           filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* v72: 3줄 형식 스타일 */
+        .three-line-display {
+          flex: 1;
+        }
+        
+        .three-line-display .line1 {
+          margin: 0;
+          color: #333;
+          font-size: 1.25rem;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+        
+        .three-line-display .line2 {
+          color: #555;
+          font-size: 1rem;
+          margin: 0.3rem 0 0 0;
+          font-weight: 500;
+        }
+        
+        .three-line-display .line3 {
+          color: #888;
+          font-size: 0.9rem;
+          margin: 0.2rem 0 0 0;
         }
 
         .card-header h2 {
