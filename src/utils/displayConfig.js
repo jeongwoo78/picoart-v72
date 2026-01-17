@@ -745,27 +745,14 @@ export function getThreeLineDisplay(category, key, artistKey = null) {
     }
   }
   
-  // 사조: AI 선택 화가가 있으면 2줄에 화가명 표시
+  // 사조: 항상 대표화가 3명 표시 (AI 선택 화가는 교육자료에서 표시)
   if (category === 'movements') {
     const movementInfo = THREE_LINE_DISPLAY.movements[normalizedKey];
     if (!movementInfo) {
       return { line1: key, line2: '', line3: '' };
     }
     
-    // AI가 화가를 선택한 경우
-    if (artistKey) {
-      const normalizedArtist = normalizeKey(artistKey);
-      const artistInfo = THREE_LINE_DISPLAY.artists[normalizedArtist];
-      if (artistInfo) {
-        return {
-          line1: movementInfo.line1,
-          line2: artistInfo.fullName,  // 화가명(영문)
-          line3: movementInfo.line3
-        };
-      }
-    }
-    
-    // 화가 선택 없으면 기본 (대표화가 3명)
+    // 항상 기본 (대표화가 3명) 반환
     return {
       line1: movementInfo.line1,
       line2: movementInfo.line2,

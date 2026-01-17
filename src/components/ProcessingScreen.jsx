@@ -1,6 +1,6 @@
-// PicoArt v72 - ProcessingScreen (3줄 형식 + 단일 변환 스와이프)
+// PicoArt v72 - ProcessingScreen
+// v72: 단일 변환도 원클릭과 동일 구조 (원본사진 + 점 + 숫자 + 스와이프)
 // v72: displayConfig.js 3줄 형식 컨트롤 타워 사용
-// v72: 단일 변환에서도 원본사진 + 스와이프 기능 추가
 import React, { useEffect, useState } from 'react';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 import { educationContent } from '../data/educationContent';
@@ -24,10 +24,10 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   const [statusText, setStatusText] = useState('준비 중...');
   const [showEducation, setShowEducation] = useState(false);
   
-  // 원클릭 상태
+  // 공통 상태 (원클릭 + 단일 변환 통일)
   const [completedResults, setCompletedResults] = useState([]);
   const [completedCount, setCompletedCount] = useState(0);
-  const [viewIndex, setViewIndex] = useState(-1);
+  const [viewIndex, setViewIndex] = useState(-1);  // -1: 원본+1차교육, 0~N: 결과
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
   
@@ -35,8 +35,8 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   const isFullTransform = selectedStyle?.isFullTransform === true;
   const category = selectedStyle?.category;
   
-  // 원클릭 시 전달받은 스타일 배열 사용
-  const styles = isFullTransform ? (selectedStyle?.styles || []) : [];
+  // 스타일 배열 (원클릭: N개, 단일: 1개)
+  const styles = isFullTransform ? (selectedStyle?.styles || []) : [selectedStyle];
   const totalCount = styles.length;
 
   useEffect(() => {
@@ -45,16 +45,17 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
 
   // ========== 메인 프로세스 ==========
   const startProcess = async () => {
+    setShowEducation(true);
+    
     if (isFullTransform) {
-      // 원클릭: 1차 교육 표시 후 순차 변환
-      setShowEducation(true);
+      // 원클릭: N개 순차 변환
       setStatusText(`${totalCount}개 스타일 변환을 시작합니다...`);
       await sleep(1500);
       
       const results = [];
       for (let i = 0; i < styles.length; i++) {
         const style = styles[i];
-        setStatusText(`[${i}/${totalCount}] ${style.name} 변환 중...`);
+        setStatusText(`[${i + 1}/${totalCount}] ${style.name} 변환 중...`);
         
         const result = await processSingleStyle(style, i, totalCount);
         results.push(result);
@@ -73,15 +74,20 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
       
       onComplete(selectedStyle, results, { isFullTransform: true, category, results });
     } else {
-      // 단일 변환
-      setShowEducation(true);
+      // 단일 변환: 1개 변환
       const eduContent = getSingleEducationContent(selectedStyle);
       if (eduContent) {
-        setStatusText(`${eduContent.title} 스타일 분석 중...`);
+        setStatusText(`${eduContent.title || selectedStyle.name} 스타일 분석 중...`);
+      } else {
+        setStatusText(`${selectedStyle.name} 스타일 분석 중...`);
       }
       await sleep(1000);
       
       const result = await processSingleStyle(selectedStyle);
+      
+      // 단일 변환도 results 배열에 저장 (UI 통일)
+      setCompletedResults([result]);
+      setCompletedCount(1);
       
       if (result.success) {
         setStatusText(`${result.aiSelectedArtist || selectedStyle.name} 화풍으로 변환 완료!`);
@@ -104,82 +110,74 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
         null,
         (progressText) => {
           if (total > 1) {
-            setStatusText(`[${index}/${total}] ${progressText}`);
+            setStatusText(`[${index + 1}/${total}] ${progressText}`);
           } else {
             setStatusText(progressText);
           }
         }
       );
 
-      if (!result.success) {
-        return { success: false, error: result.error || '변환 실패', style };
+      if (result.success) {
+        return {
+          style,
+          resultUrl: result.resultUrl,
+          aiSelectedArtist: result.aiSelectedArtist,
+          selected_work: result.selected_work,
+          success: true
+        };
+      } else {
+        return { 
+          style, 
+          error: result.error, 
+          aiSelectedArtist: result.aiSelectedArtist,
+          selected_work: result.selected_work,
+          success: false 
+        };
       }
-
-      return {
-        success: true,
-        resultUrl: result.resultUrl,
-        aiSelectedArtist: result.aiSelectedArtist,
-        selected_work: result.selected_work,
-        style: style,
-        selectionMethod: result.selectionMethod,
-        selectionDetails: result.selectionDetails
-      };
-    } catch (error) {
-      console.error('processSingleStyle error:', error);
-      return { success: false, error: error.message, style };
+    } catch (err) {
+      return { style, error: err.message, success: false };
     }
   };
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  // ========== 단일 변환 1차 교육자료 ==========
+  // ========== 단일 변환용 1차 교육자료 ==========
   const getSingleEducationContent = (style) => {
     if (!style) return null;
     
     const cat = style.category;
     const styleId = style.id || style.name;
+    const normalizedId = normalizeKey(styleId);
     
-    // 거장
-    if (cat === 'masters' && educationContent.masters?.[styleId]) {
-      const content = educationContent.masters[styleId];
-      return { title: content.title || style.name, desc: content.content };
+    // educationContent에서 직접 조회
+    if (cat === 'movements' && educationContent.movements) {
+      // movements는 movementsOverview를 참조
+      return educationContent.movements[normalizedId] || educationContent.movements[styleId];
+    }
+    if (cat === 'masters' && educationContent.masters) {
+      // masters는 mastersEducation을 참조
+      return educationContent.masters[normalizedId] || educationContent.masters[styleId];
+    }
+    if (cat === 'oriental' && educationContent.oriental) {
+      // oriental은 orientalOverview를 참조
+      return educationContent.oriental[normalizedId] || educationContent.oriental[styleId];
     }
     
-    // 사조
-    if (cat === 'movements') {
-      const key = normalizeKey(styleId);
-      if (educationContent.movements?.[key]) {
-        const content = educationContent.movements[key];
-        return { title: content.title || style.name, desc: content.content };
-      }
-    }
-    
-    // 동양화
-    if (cat === 'oriental') {
-      const key = normalizeKey(styleId);
-      if (educationContent.oriental?.[key]) {
-        const content = educationContent.oriental[key];
-        return { title: content.title || style.name, desc: content.content };
-      }
-    }
-    
-    return { title: style.name || '스타일', desc: '' };
+    return null;
   };
 
   // ========== 원클릭 1차 교육자료 ==========
   const getPrimaryEducation = () => {
     if (!category) return null;
     
-    const primaryData = {
-      masters: oneclickMastersPrimary,
-      movements: oneclickMovementsPrimary,
-      oriental: oneclickOrientalPrimary
-    };
-    
-    const data = primaryData[category];
-    if (!data) return null;
-    
-    return { title: data.title || '1차 교육', content: data.content || '' };
+    if (category === 'movements') {
+      return { ...oneclickMovementsPrimary, title: '2,500년 서양미술사 관통' };
+    } else if (category === 'masters') {
+      return oneclickMastersPrimary;
+    } else if (category === 'oriental') {
+      return oneclickOrientalPrimary;
+    }
+    return null;
   };
 
   // ========== 원클릭 2차 교육자료 ==========
@@ -238,8 +236,8 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
     return { line1: result?.style?.name || '', line2: '', line3: '' };
   };
 
-  // 단일 변환용 3줄 (스타일 기반)
-  const getSingleThreeLines = () => {
+  // 스타일 기반 3줄 (로딩 시 사용)
+  const getStyleThreeLines = () => {
     const cat = selectedStyle?.category;
     const styleKey = selectedStyle?.id || selectedStyle?.name;
     
@@ -264,7 +262,7 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   
   const handleBackToEducation = () => setViewIndex(-1);
 
-  // v72: 단일 변환에서도 스와이프 가능
+  // 스와이프 핸들러 (단일 변환 + 원클릭 공통)
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX);
     setTouchStartY(e.touches[0].clientY);
@@ -277,26 +275,37 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
     
     // 수평 스와이프만 인식
     if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-      if (isFullTransform) {
-        // 원클릭: 기존 로직
-        if (diffX > 0 && viewIndex < completedCount - 1) setViewIndex(v => v + 1);
-        if (diffX < 0 && viewIndex > -1) setViewIndex(v => v - 1);
+      const maxIndex = completedCount - 1;
+      
+      if (diffX > 0) {
+        // 왼쪽 스와이프 → 다음
+        if (viewIndex < maxIndex) {
+          setViewIndex(v => v + 1);
+        }
       } else {
-        // 단일 변환: -1(원본+교육) ↔ 아무것도 없음 (단순 토글은 없음)
-        // 단일 변환에서는 스와이프로 화면 전환 안 함 (원본 사진만 표시)
+        // 오른쪽 스와이프 → 이전
+        if (viewIndex > -1) {
+          setViewIndex(v => v - 1);
+        }
       }
     }
     setTouchStartX(0);
     setTouchStartY(0);
   };
 
-  // 현재 보여줄 결과 (원클릭용)
+  // 현재 보여줄 결과
   const previewResult = viewIndex >= 0 ? completedResults[viewIndex] : null;
   const previewEdu = previewResult ? getSecondaryEducation(previewResult) : null;
   const previewThreeLines = previewResult ? getThreeLines(previewResult) : null;
 
-  // 단일 변환용 3줄
-  const singleThreeLines = getSingleThreeLines();
+  // 로딩 시 3줄
+  const styleThreeLines = getStyleThreeLines();
+  
+  // 단일 변환 교육자료
+  const singleEduContent = !isFullTransform ? getSingleEducationContent(selectedStyle) : null;
+
+  // 점 개수: 원클릭은 totalCount개, 단일은 1개
+  const dotCount = isFullTransform ? totalCount : 1;
 
   return (
     <div className="processing-screen">
@@ -316,106 +325,114 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           <p>{statusText}</p>
         </div>
 
-        {/* ===== 원클릭 모드 ===== */}
-        {isFullTransform && (
-          <>
-            {/* 1차 교육 + 원본 사진 */}
-            {viewIndex === -1 && showEducation && getPrimaryEducation() && (
-              <div className="preview">
-                <img src={URL.createObjectURL(photo)} alt="원본 사진" />
-                <div className="preview-info three-lines">
-                  <div className="line1">{selectedStyle?.name || '전체 변환'}</div>
-                </div>
-                <div className="edu-card primary">
-                  <h3>{getPrimaryEducation().title}</h3>
-                  <p>{getPrimaryEducation().content}</p>
-                  {completedCount > 0 && <p className="hint">👆 완료된 결과를 확인하세요</p>}
-                </div>
-              </div>
-            )}
-
-            {/* 결과 미리보기 (3줄 형식) */}
-            {viewIndex >= 0 && previewResult && (
-              <div className="preview">
-                <img src={previewResult.resultUrl} alt="" />
-                <div className="preview-info three-lines">
-                  <div className="line1">{previewThreeLines?.line1}</div>
-                  <div className="line2">{previewThreeLines?.line2}</div>
-                  <div className="line3">{previewThreeLines?.line3}</div>
-                </div>
-                {previewEdu && (
-                  <div className="edu-card secondary">
-                    <p>{previewEdu.content}</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 점 네비게이션 */}
-            <div className="dots-nav">
-              <button 
-                className="nav-btn"
-                onClick={() => {
-                  if (viewIndex === -1 && completedCount > 0) {
-                    setViewIndex(completedCount - 1);
-                  } else if (viewIndex > 0) {
-                    setViewIndex(viewIndex - 1);
-                  } else if (viewIndex === 0) {
-                    setViewIndex(-1);
-                  }
-                }}
-                disabled={viewIndex === -1 && completedCount === 0}
-              >
-                ◀ 이전
-              </button>
-              
-              <div className="dots">
-                <span 
-                  className={`dot edu-dot ${viewIndex === -1 ? 'active' : ''}`}
-                  onClick={handleBackToEducation}
-                >📚</span>
-                {completedResults.map((_, idx) => (
-                  <span 
-                    key={idx}
-                    className={`dot ${viewIndex === idx ? 'active' : ''} ${idx >= completedCount ? 'pending' : ''}`}
-                    onClick={() => handleDotClick(idx)}
-                  />
-                ))}
-              </div>
-              
-              <button 
-                className="nav-btn"
-                onClick={() => {
-                  if (viewIndex === -1 && completedCount > 0) {
-                    setViewIndex(0);
-                  } else if (viewIndex < completedCount - 1) {
-                    setViewIndex(viewIndex + 1);
-                  }
-                }}
-                disabled={viewIndex >= completedCount - 1 || completedCount === 0}
-              >
-                다음 ▶
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* ===== 단일 변환 모드 (v72: 원본사진 + 3줄 형식) ===== */}
-        {!isFullTransform && showEducation && (
+        {/* ===== 원본 + 1차 교육 (viewIndex === -1) ===== */}
+        {viewIndex === -1 && showEducation && (
           <div className="preview">
             <img src={URL.createObjectURL(photo)} alt="원본 사진" />
             <div className="preview-info three-lines">
-              <div className="line1">{singleThreeLines.line1}</div>
-              <div className="line2">{singleThreeLines.line2}</div>
-              <div className="line3">{singleThreeLines.line3}</div>
+              <div className="line1">{styleThreeLines.line1}</div>
+              <div className="line2">{styleThreeLines.line2}</div>
+              <div className="line3">{styleThreeLines.line3}</div>
             </div>
-            {getSingleEducationContent(selectedStyle)?.desc && (
+            {/* 원클릭: 1차 교육 */}
+            {isFullTransform && getPrimaryEducation() && (
               <div className="edu-card primary">
-                <p>{getSingleEducationContent(selectedStyle).desc}</p>
+                <h3>{getPrimaryEducation().title}</h3>
+                <p>{getPrimaryEducation().content}</p>
+              </div>
+            )}
+            {/* 단일 변환: 1차 교육 */}
+            {!isFullTransform && singleEduContent && (
+              <div className="edu-card primary">
+                <h3>{singleEduContent.title || selectedStyle.name}</h3>
+                <p>{singleEduContent.desc || singleEduContent.content || ''}</p>
+              </div>
+            )}
+            {completedCount > 0 && (
+              <p className="hint">👆 스와이프하여 완료된 결과를 확인하세요</p>
+            )}
+          </div>
+        )}
+
+        {/* ===== 결과 미리보기 (viewIndex >= 0) ===== */}
+        {viewIndex >= 0 && previewResult && (
+          <div className="preview">
+            {previewResult.success ? (
+              <img src={previewResult.resultUrl} alt="변환 결과" />
+            ) : (
+              <div className="error-preview">
+                <p>❌ 변환 실패</p>
+                <p>{previewResult.error}</p>
+              </div>
+            )}
+            <div className="preview-info three-lines">
+              <div className="line1">{previewThreeLines?.line1}</div>
+              <div className="line2">{previewThreeLines?.line2}</div>
+              <div className="line3">{previewThreeLines?.line3}</div>
+            </div>
+            {previewEdu && (
+              <div className="edu-card secondary">
+                <p>{previewEdu.content}</p>
               </div>
             )}
           </div>
         )}
+
+        {/* ===== 점 네비게이션 + 숫자 ===== */}
+        <div className="dots-nav">
+          <button 
+            className="nav-btn"
+            onClick={() => {
+              if (viewIndex === -1 && completedCount > 0) {
+                setViewIndex(completedCount - 1);
+              } else if (viewIndex > 0) {
+                setViewIndex(viewIndex - 1);
+              } else if (viewIndex === 0) {
+                setViewIndex(-1);
+              }
+            }}
+            disabled={viewIndex === -1 && completedCount === 0}
+          >
+            ◀ 이전
+          </button>
+          
+          <div className="dots-container">
+            {/* 숫자 표시: 0/N 형식 */}
+            <span className="page-number">
+              {viewIndex === -1 ? 0 : viewIndex + 1}/{dotCount}
+            </span>
+            
+            {/* 점 표시 */}
+            <div className="dots">
+              <span 
+                className={`dot ${viewIndex === -1 ? 'active' : ''}`}
+                onClick={handleBackToEducation}
+                title="원본"
+              />
+              {Array.from({ length: dotCount }).map((_, idx) => (
+                <span 
+                  key={idx}
+                  className={`dot ${viewIndex === idx ? 'active' : ''} ${idx >= completedCount ? 'pending' : ''}`}
+                  onClick={() => handleDotClick(idx)}
+                />
+              ))}
+            </div>
+          </div>
+          
+          <button 
+            className="nav-btn"
+            onClick={() => {
+              if (viewIndex === -1 && completedCount > 0) {
+                setViewIndex(0);
+              } else if (viewIndex < completedCount - 1) {
+                setViewIndex(viewIndex + 1);
+              }
+            }}
+            disabled={viewIndex >= completedCount - 1 || completedCount === 0}
+          >
+            다음 ▶
+          </button>
+        </div>
       </div>
 
       <style>{`
@@ -461,25 +478,20 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        .edu-card {
-          padding: 16px;
-          border-radius: 10px;
-          margin: 16px 0;
+        .preview { 
+          background: #f8f9fa; 
+          border-radius: 12px; 
+          overflow: hidden; 
+          margin: 16px 0; 
         }
-        .edu-card.primary {
-          background: linear-gradient(135deg, #fff5f5, #ffe5e5);
-          border-left: 3px solid #667eea;
-        }
-        .edu-card.secondary {
-          background: linear-gradient(135deg, #f0fff0, #e5ffe5);
-          border-left: 3px solid #4CAF50;
-        }
-        .edu-card h3 { color: #667eea; margin: 0 0 10px; font-size: 15px; }
-        .edu-card p { color: #333; line-height: 1.6; font-size: 13px; margin: 0; white-space: pre-line; }
-        .hint { color: #999; font-size: 12px; text-align: center; margin-top: 12px !important; }
-        
-        .preview { background: #f8f9fa; border-radius: 12px; overflow: hidden; margin: 16px 0; }
         .preview img { width: 100%; display: block; }
+        
+        .error-preview {
+          padding: 40px 20px;
+          text-align: center;
+          background: #fff5f5;
+        }
+        .error-preview p { margin: 8px 0; color: #e53935; }
         
         /* v72: 3줄 형식 */
         .preview-info.three-lines { 
@@ -502,43 +514,92 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           color: #888;
         }
         
+        .edu-card {
+          padding: 16px;
+          border-radius: 10px;
+          margin: 16px;
+        }
+        .edu-card.primary {
+          background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+          border-left: 3px solid #667eea;
+        }
+        .edu-card.secondary {
+          background: linear-gradient(135deg, #f0fff0, #e5ffe5);
+          border-left: 3px solid #4CAF50;
+        }
+        .edu-card h3 { color: #667eea; margin: 0 0 10px; font-size: 15px; }
+        .edu-card p { color: #333; line-height: 1.6; font-size: 13px; margin: 0; white-space: pre-line; }
+        
+        .hint { 
+          color: #999; 
+          font-size: 12px; 
+          text-align: center; 
+          margin: 12px 16px !important;
+          padding: 0;
+        }
+        
+        /* 점 네비게이션 */
         .dots-nav {
           display: flex;
           align-items: center;
-          justify-content: center;
+          justify-content: space-between;
           gap: 8px;
           margin: 16px 0;
+          padding: 0 8px;
         }
+        
+        .dots-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        
+        .page-number {
+          font-size: 12px;
+          color: #666;
+          font-weight: 500;
+        }
+        
         .dots {
           display: flex;
           align-items: center;
           gap: 6px;
         }
         .dot {
-          width: 8px; height: 8px;
+          width: 8px; 
+          height: 8px;
           border-radius: 50%;
           background: #ddd;
           cursor: pointer;
           transition: all 0.2s;
         }
-        .dot.active { background: #667eea; transform: scale(1.3); }
-        .dot.pending { background: #f0f0f0; }
-        .dot.edu-dot {
-          width: auto; height: auto;
-          background: none;
-          font-size: 16px;
+        .dot.active { 
+          background: #667eea; 
+          transform: scale(1.3); 
         }
+        .dot.pending { 
+          background: #f0f0f0; 
+          cursor: not-allowed;
+        }
+        
         .nav-btn {
-          padding: 6px 10px;
+          padding: 8px 12px;
           background: #f5f5f5;
           border: none;
           border-radius: 6px;
           font-size: 12px;
           cursor: pointer;
           color: #666;
+          white-space: nowrap;
         }
-        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .nav-btn:not(:disabled):hover { background: #e0e0e0; }
+        .nav-btn:disabled { 
+          opacity: 0.4; 
+          cursor: not-allowed; 
+        }
+        .nav-btn:not(:disabled):hover { 
+          background: #e0e0e0; 
+        }
       `}</style>
     </div>
   );
