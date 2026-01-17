@@ -18,6 +18,26 @@ import { processStyleTransfer } from '../utils/styleTransferAPI';
 import { normalizeKey, getThreeLineDisplay, getArtistName } from '../utils/displayConfig';
 import { getEducationKey } from '../utils/educationMatcher';
 
+// 교육자료 콘텐츠 가져오기 헬퍼 함수
+const getEducationContent = (category, key, educationData) => {
+  if (!category || !key || !educationData) return null;
+  const categoryData = educationData[category];
+  if (!categoryData) return null;
+  
+  // 1차: 정확한 키로 매칭
+  if (categoryData[key]) {
+    return categoryData[key].content || categoryData[key].desc || null;
+  }
+  
+  // 2차: 키에서 작품 부분 제거 후 매칭 (vangogh-starrynight → vangogh)
+  const baseKey = key.split('-')[0];
+  if (categoryData[baseKey]) {
+    return categoryData[baseKey].content || categoryData[baseKey].desc || null;
+  }
+  
+  return null;
+};
+
 
 const ResultScreen = ({ 
   originalPhoto, 
@@ -43,7 +63,8 @@ const ResultScreen = ({
   const isFullTransform = fullTransformResults && fullTransformResults.length > 0;
   
   // currentIndex를 App.jsx에서 관리 (갤러리 이동해도 유지)
-  const currentIndex = appCurrentIndex || 0;
+  // -1 = 원본+1차교육, 0~N-1 = 결과
+  const currentIndex = appCurrentIndex !== undefined ? appCurrentIndex : -1;
   const setCurrentIndex = (val) => {
     if (onMasterIndexChange) {
       onMasterIndexChange(typeof val === 'function' ? val(currentIndex) : val);
@@ -53,6 +74,9 @@ const ResultScreen = ({
   // ========== 스와이프 ==========
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  
+  // ========== 단독변환 인덱스 (0=원본, 1=결과) ==========
+  const [singleViewIndex, setSingleViewIndex] = useState(1); // 기본: 결과 보여주기
   
   // ========== 재시도 관련 ==========
   const [results, setResults] = useState(fullTransformResults || []);
@@ -69,8 +93,8 @@ const ResultScreen = ({
   // 실패한 결과 개수
   const failedCount = results.filter(r => !r.success).length;
   
-  // 현재 보여줄 결과
-  const currentResult = isFullTransform ? results[currentIndex] : null;
+  // 현재 보여줄 결과 (-1이면 원본)
+  const currentResult = isFullTransform && currentIndex >= 0 ? results[currentIndex] : null;
   // 단독변환: 재시도 성공 시 singleRetryResult 사용
   const [singleRetryResultState, setSingleRetryResultState] = useState(null);
   const displayImage = isFullTransform 
@@ -508,8 +532,13 @@ const ResultScreen = ({
       // console.log('   - artist:', artist);
       // console.log('   - work:', work);
       
-      // 새로운 매칭 함수 사용
-      const key = getEducationKey(category, artist, work);
+      // 새로운 매칭 함수 사용 (객체로 전달)
+      const key = getEducationKey(category, {
+        aiSelectedArtist: artist,
+        selected_work: work,
+        styleId: currentResult?.style?.id,
+        masterId: currentResult?.style?.id?.replace('-master', '')
+      });
       // console.log('   - matched key:', key);
       
       if (key) {
@@ -1907,17 +1936,38 @@ const ResultScreen = ({
   };
 
   const handleTouchEnd = (e) => {
-    if (!isFullTransform || !touchStartX) return;
+    if (!touchStartX) return;
     const diffX = touchStartX - e.changedTouches[0].clientX;
     const diffY = touchStartY - e.changedTouches[0].clientY;
     
     // 수평 스와이프만 인식 (X축 이동이 Y축보다 커야 함)
     if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 0 && currentIndex < results.length - 1) {
-        setCurrentIndex(i => i + 1);  // 왼쪽 스와이프 → 다음
-      }
-      if (diffX < 0 && currentIndex > 0) {
-        setCurrentIndex(i => i - 1);  // 오른쪽 스와이프 → 이전
+      if (isFullTransform) {
+        // 원클릭 스와이프
+        if (diffX > 0 && currentIndex < results.length - 1) {
+          // 왼쪽 스와이프 → 다음
+          if (currentIndex === -1) {
+            setCurrentIndex(0);
+          } else {
+            setCurrentIndex(i => i + 1);
+          }
+        }
+        if (diffX < 0 && currentIndex > -1) {
+          // 오른쪽 스와이프 → 이전
+          if (currentIndex === 0) {
+            setCurrentIndex(-1);
+          } else {
+            setCurrentIndex(i => i - 1);
+          }
+        }
+      } else {
+        // 단독변환 스와이프
+        if (diffX > 0 && singleViewIndex < 1) {
+          setSingleViewIndex(1);  // 왼쪽 스와이프 → 결과
+        }
+        if (diffX < 0 && singleViewIndex > 0) {
+          setSingleViewIndex(0);  // 오른쪽 스와이프 → 원본
+        }
       }
     }
     setTouchStartX(0);
@@ -1945,20 +1995,33 @@ const ResultScreen = ({
           </p>
         </div>
 
-        {/* 원클릭: 이미지만 표시 (재변환 결과 반영) */}
-        {isFullTransform && (
+        {/* 원클릭: 원본 사진 (currentIndex === -1) */}
+        {isFullTransform && currentIndex === -1 && (
+          <div className="result-image-wrapper original-view">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+            <div className="original-label">원본 사진</div>
+          </div>
+        )}
+
+        {/* 원클릭: 변환 결과 (currentIndex >= 0) */}
+        {isFullTransform && currentIndex >= 0 && (
           <div className="result-image-wrapper">
             <img src={currentMasterResultImage || displayImage} alt="변환 결과" className="result-image" />
           </div>
         )}
 
-        {/* 단일 변환: Before/After Slider (v68: 재변환 결과 반영) */}
-        {!isFullTransform && finalDisplayImage && (
-          <div className="comparison-wrapper">
-            <BeforeAfter 
-              beforeImage={URL.createObjectURL(originalPhoto)}
-              afterImage={finalDisplayImage}
-            />
+        {/* 단일 변환: 원본 사진 (singleViewIndex === 0) */}
+        {!isFullTransform && singleViewIndex === 0 && (
+          <div className="result-image-wrapper original-view">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+            <div className="original-label">원본 사진</div>
+          </div>
+        )}
+
+        {/* 단일 변환: 변환 결과 (singleViewIndex === 1) */}
+        {!isFullTransform && singleViewIndex === 1 && finalDisplayImage && (
+          <div className="result-image-wrapper">
+            <img src={finalDisplayImage} alt="변환 결과" className="result-image" />
           </div>
         )}
 
@@ -2078,12 +2141,18 @@ const ResultScreen = ({
         {isFullTransform && (
           <div className="fullTransform-nav">
             <button 
-              onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-              disabled={currentIndex === 0 || isRetrying}
+              onClick={() => {
+                if (currentIndex > 0) {
+                  setCurrentIndex(i => i - 1);
+                } else if (currentIndex === 0) {
+                  setCurrentIndex(-1);
+                }
+              }}
+              disabled={currentIndex === -1 || isRetrying}
               className="nav-btn"
               style={{ opacity: isRetrying ? 0.5 : 1 }}
             >
-              ◀ 이전
+              ◀
             </button>
             <div className="nav-dots">
               {fullTransformResults.map((_, idx) => (
@@ -2095,14 +2164,56 @@ const ResultScreen = ({
                   style={{ opacity: isRetrying ? 0.5 : 1 }}
                 />
               ))}
+              <span className="progress-counter">
+                {currentIndex === -1 ? 0 : currentIndex + 1}/{fullTransformResults.length}
+              </span>
             </div>
             <button 
-              onClick={() => setCurrentIndex(i => Math.min(fullTransformResults.length - 1, i + 1))}
+              onClick={() => {
+                if (currentIndex === -1) {
+                  setCurrentIndex(0);
+                } else if (currentIndex < fullTransformResults.length - 1) {
+                  setCurrentIndex(i => i + 1);
+                }
+              }}
               disabled={currentIndex === fullTransformResults.length - 1 || isRetrying}
               className="nav-btn"
               style={{ opacity: isRetrying ? 0.5 : 1 }}
             >
-              다음 ▶
+              ▶
+            </button>
+          </div>
+        )}
+
+        {/* 단독변환 네비게이션 */}
+        {!isFullTransform && finalDisplayImage && (
+          <div className="fullTransform-nav">
+            <button 
+              onClick={() => setSingleViewIndex(0)}
+              disabled={singleViewIndex === 0}
+              className="nav-btn"
+            >
+              ◀
+            </button>
+            <div className="nav-dots">
+              <button
+                className={`nav-dot ${singleViewIndex === 0 ? 'active' : ''}`}
+                onClick={() => setSingleViewIndex(0)}
+              />
+              <button
+                className={`nav-dot ${singleViewIndex === 1 ? 'active' : ''}`}
+                onClick={() => setSingleViewIndex(1)}
+              />
+              <span className="progress-counter">
+                {singleViewIndex}/1
+              </span>
+            </div>
+            <button 
+              onClick={() => setSingleViewIndex(1)}
+              disabled={singleViewIndex === 1}
+              className="nav-btn"
+            >
+              ▶
             </button>
           </div>
         )}
@@ -2621,6 +2732,7 @@ const ResultScreen = ({
         }
         .nav-dots {
           display: flex;
+          align-items: center;
           gap: 6px;
         }
         .nav-dot {
@@ -2635,6 +2747,28 @@ const ResultScreen = ({
         .nav-dot.active {
           background: #667eea;
           transform: scale(1.3);
+        }
+        .progress-counter {
+          font-size: 12px;
+          font-weight: 600;
+          color: #667eea;
+          margin-left: 8px;
+        }
+        
+        /* 원본 사진 라벨 */
+        .original-view {
+          position: relative;
+        }
+        .original-label {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          background: rgba(0,0,0,0.6);
+          color: white;
+          padding: 4px 10px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
         }
         
         /* 원클릭 이미지 */

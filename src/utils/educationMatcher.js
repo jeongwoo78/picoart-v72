@@ -109,20 +109,12 @@ const MASTER_DEFAULT_KEYS = {
 /**
  * 거장 교육자료 키 가져오기
  * @param {string} masterKey - 거장 키 (vangogh, klimt 등)
- * @param {string} selectedWork - AI가 선택한 작품명
+ * @param {string} selectedWork - AI가 선택한 작품명 (미사용, 하위호환용)
  */
 export function getMasterEducationKey(masterKey, selectedWork) {
-  // 작품명으로 매칭 시도
-  if (selectedWork) {
-    const workLower = selectedWork.toLowerCase().trim();
-    if (MASTERS_WORK_MAP[workLower]) {
-      return MASTERS_WORK_MAP[workLower];
-    }
-  }
-  
-  // 작품 매칭 실패시 기본 키
+  // v72: 작품별 매칭 제거, 화가별 단순 키만 반환
   const normalizedMaster = normalizeKey(masterKey);
-  return MASTER_DEFAULT_KEYS[normalizedMaster] || `${normalizedMaster}-default`;
+  return normalizedMaster;
 }
 
 /**

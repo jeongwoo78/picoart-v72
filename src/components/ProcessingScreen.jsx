@@ -1,6 +1,7 @@
 // PicoArt v72 - ProcessingScreen
 // v72: 단일 변환도 원클릭과 동일 구조 (원본사진 + 점 + 숫자 + 스와이프)
 // v72: displayConfig.js 3줄 형식 컨트롤 타워 사용
+// v72: 점 상태 (done/active/disabled) + 화살표 점 옆 배치
 import React, { useEffect, useState } from 'react';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 import { educationContent } from '../data/educationContent';
@@ -151,15 +152,12 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
     
     // educationContent에서 직접 조회
     if (cat === 'movements' && educationContent.movements) {
-      // movements는 movementsOverview를 참조
       return educationContent.movements[normalizedId] || educationContent.movements[styleId];
     }
     if (cat === 'masters' && educationContent.masters) {
-      // masters는 mastersEducation을 참조
       return educationContent.masters[normalizedId] || educationContent.masters[styleId];
     }
     if (cat === 'oriental' && educationContent.oriental) {
-      // oriental은 orientalOverview를 참조
       return educationContent.oriental[normalizedId] || educationContent.oriental[styleId];
     }
     
@@ -304,9 +302,6 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   // 단일 변환 교육자료
   const singleEduContent = !isFullTransform ? getSingleEducationContent(selectedStyle) : null;
 
-  // 점 개수: 원클릭은 totalCount개, 단일은 1개
-  const dotCount = isFullTransform ? totalCount : 1;
-
   return (
     <div className="processing-screen">
       <div 
@@ -378,7 +373,7 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           </div>
         )}
 
-        {/* ===== 점 네비게이션 + 숫자 ===== */}
+        {/* ===== 점 네비게이션 (v67 스타일: 화살표 점 옆에) ===== */}
         <div className="dots-nav">
           <button 
             className="nav-btn"
@@ -391,32 +386,26 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                 setViewIndex(-1);
               }
             }}
-            disabled={viewIndex === -1 && completedCount === 0}
+            disabled={viewIndex === -1}
           >
-            ◀ 이전
+            ◀
           </button>
           
-          <div className="dots-container">
-            {/* 숫자 표시: 0/N 형식 */}
-            <span className="page-number">
-              {viewIndex === -1 ? 0 : viewIndex + 1}/{dotCount}
-            </span>
-            
-            {/* 점 표시 */}
-            <div className="dots">
-              <span 
-                className={`dot ${viewIndex === -1 ? 'active' : ''}`}
-                onClick={handleBackToEducation}
-                title="원본"
+          <div className="dots">
+            {/* 결과 점들 */}
+            {Array.from({ length: totalCount }).map((_, idx) => (
+              <button 
+                key={idx}
+                className={`dot ${idx < completedCount ? 'done' : ''} ${viewIndex === idx ? 'active' : ''}`}
+                onClick={() => handleDotClick(idx)}
+                disabled={idx >= completedCount}
               />
-              {Array.from({ length: dotCount }).map((_, idx) => (
-                <span 
-                  key={idx}
-                  className={`dot ${viewIndex === idx ? 'active' : ''} ${idx >= completedCount ? 'pending' : ''}`}
-                  onClick={() => handleDotClick(idx)}
-                />
-              ))}
-            </div>
+            ))}
+            
+            {/* 진행 상황 카운터 */}
+            <span className="progress-counter">
+              {viewIndex === -1 ? 0 : viewIndex + 1}/{totalCount}
+            </span>
           </div>
           
           <button 
@@ -424,13 +413,13 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
             onClick={() => {
               if (viewIndex === -1 && completedCount > 0) {
                 setViewIndex(0);
-              } else if (viewIndex < completedCount - 1) {
+              } else if (viewIndex >= 0 && viewIndex < completedCount - 1) {
                 setViewIndex(viewIndex + 1);
               }
             }}
             disabled={viewIndex >= completedCount - 1 || completedCount === 0}
           >
-            다음 ▶
+            ▶
           </button>
         </div>
       </div>
@@ -538,67 +527,60 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           padding: 0;
         }
         
-        /* 점 네비게이션 */
+        /* v67 스타일: 점 네비게이션 (화살표 점 옆에) */
         .dots-nav {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-          margin: 16px 0;
-          padding: 0 8px;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 16px;
         }
-        
-        .dots-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
+        .dots-nav .nav-btn {
+          padding: 8px 14px;
+          background: #667eea;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 13px;
+          cursor: pointer;
+          min-width: 40px;
         }
-        
-        .page-number {
-          font-size: 12px;
-          color: #666;
-          font-weight: 500;
+        .dots-nav .nav-btn:disabled {
+          background: #ccc;
+          cursor: not-allowed;
         }
-        
         .dots {
           display: flex;
           align-items: center;
+          justify-content: center;
           gap: 6px;
+          flex-wrap: wrap;
         }
         .dot {
-          width: 8px; 
-          height: 8px;
+          width: 10px; height: 10px;
           border-radius: 50%;
+          border: none;
           background: #ddd;
           cursor: pointer;
+          padding: 0;
           transition: all 0.2s;
         }
+        .dot.done { background: #4CAF50; }
         .dot.active { 
-          background: #667eea; 
-          transform: scale(1.3); 
+          transform: scale(1.4); 
+          box-shadow: 0 0 0 2px rgba(102,126,234,0.4); 
         }
-        .dot.pending { 
-          background: #f0f0f0; 
-          cursor: not-allowed;
-        }
-        
-        .nav-btn {
-          padding: 8px 12px;
-          background: #f5f5f5;
-          border: none;
-          border-radius: 6px;
+        .dot:disabled { opacity: 0.4; cursor: default; }
+        .progress-counter {
           font-size: 12px;
-          cursor: pointer;
-          color: #666;
-          white-space: nowrap;
+          font-weight: 600;
+          color: #667eea;
+          margin-left: 8px;
         }
-        .nav-btn:disabled { 
-          opacity: 0.4; 
-          cursor: not-allowed; 
-        }
-        .nav-btn:not(:disabled):hover { 
-          background: #e0e0e0; 
+        .count { 
+          font-size: 12px; 
+          color: #999; 
+          margin-left: 8px; 
         }
       `}</style>
     </div>
