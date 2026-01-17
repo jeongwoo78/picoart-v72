@@ -3817,11 +3817,11 @@ export default async function handler(req, res) {
           }
         );
         
-        // 502/503 에러 시 재시도
-        if (response.status === 502 || response.status === 503) {
+        // 502/503/504 에러 시 재시도
+        if (response.status === 502 || response.status === 503 || response.status === 504) {
           console.log(`🔄 FLUX Depth 재시도 (${attempt}/${MAX_RETRIES})... ${response.status} 에러`);
           if (attempt < MAX_RETRIES) {
-            await new Promise(r => setTimeout(r, 2000 * attempt)); // 2초, 4초 대기
+            await new Promise(r => setTimeout(r, 3000 * attempt)); // 3초, 6초, 9초 대기
             continue;
           }
         }

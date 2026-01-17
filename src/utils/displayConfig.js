@@ -254,6 +254,7 @@ export const ALIASES = {
   '라파엘': 'raphael',
   
   'botticelli': 'botticelli',
+  'sandro botticelli': 'botticelli',
   '보티첼리': 'botticelli',
   
   'titian': 'titian',
@@ -276,6 +277,8 @@ export const ALIASES = {
   '와토': 'watteau',
   
   'boucher': 'boucher',
+  'françois boucher': 'boucher',
+  'francois boucher': 'boucher',
   '부셰': 'boucher',
   
   'david': 'david',
@@ -295,6 +298,8 @@ export const ALIASES = {
   '쿠르베': 'courbet',
   
   'manet': 'manet',
+  'édouard manet': 'manet',
+  'edouard manet': 'manet',
   '마네': 'manet',
   
   'monet': 'monet',
@@ -302,6 +307,8 @@ export const ALIASES = {
   '모네': 'monet',
   
   'renoir': 'renoir',
+  'pierre-auguste renoir': 'renoir',
+  'auguste renoir': 'renoir',
   '르누아르': 'renoir',
   
   'degas': 'degas',
@@ -323,6 +330,7 @@ export const ALIASES = {
   '블라맹크': 'vlaminck',
   
   'kirchner': 'kirchner',
+  'ernst ludwig kirchner': 'kirchner',
   '키르히너': 'kirchner',
   
   'kokoschka': 'kokoschka',
