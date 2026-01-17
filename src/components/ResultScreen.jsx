@@ -1871,6 +1871,110 @@ const ResultScreen = ({
     }
   };
 
+  // ========== 단독변환 1차 교육 (원본 화면) ==========
+  const getSinglePrimaryEducation = () => {
+    if (isFullTransform) return null;
+    
+    const category = selectedStyle?.category;
+    const styleId = selectedStyle?.id || selectedStyle?.name;
+    const normalizedId = normalizeKey(styleId);
+    
+    // 동양화
+    if (category === 'oriental') {
+      const orientalPrimary = {
+        'korean': { title: '한국 전통회화', content: '선비는 먹으로, 민중은 색으로 그렸습니다.\n여백이 말하고, 붓끝에 정신을 담았습니다.\n조선의 자연과 삶이 고스란히 담긴 그림입니다.' },
+        'chinese': { title: '중국 전통회화', content: '먹 하나로 천지를 담았습니다.\n산은 번지고, 물은 흐르고, 안개는 스밉니다.\n그리지 않은 여백이 가장 많은 것을 말합니다.' },
+        'japanese': { title: '일본 전통회화', content: '스쳐가는 세상을 붙잡았습니다.\n파도, 꽃, 미인, 배우가 판화로 찍혀 나왔습니다.\n서민이 사고 모은 에도의 대중 예술입니다.' }
+      };
+      return orientalPrimary[normalizedId] || orientalPrimary['korean'];
+    }
+    
+    // 사조
+    if (category === 'movements') {
+      const movementPrimary = movementsEducation?.[normalizedId];
+      if (movementPrimary) {
+        return { title: movementPrimary.name || styleId, content: movementPrimary.description || '' };
+      }
+    }
+    
+    // 거장
+    if (category === 'masters') {
+      const masterPrimary = mastersEducation?.[normalizedId];
+      if (masterPrimary) {
+        return { title: masterPrimary.name || styleId, content: masterPrimary.description || '' };
+      }
+    }
+    
+    return null;
+  };
+
+  // ========== 단독변환 2차 교육 (결과 화면) ==========
+  const getSingleSecondaryEducation = () => {
+    if (isFullTransform) return null;
+    
+    const category = selectedStyle?.category;
+    const artist = displayArtist || aiSelectedArtist;
+    
+    // 동양화
+    if (category === 'oriental') {
+      const key = normalizeKey(artist);
+      const content = oneclickOrientalSecondary?.[key]?.content;
+      if (content) return content;
+      
+      // 폴백: getOrientalEducation 사용
+      return getOrientalEducation();
+    }
+    
+    // 사조
+    if (category === 'movements') {
+      const key = normalizeKey(artist);
+      const content = oneclickMovementsSecondary?.[key]?.content;
+      if (content) return content;
+    }
+    
+    // 거장
+    if (category === 'masters') {
+      const key = normalizeKey(artist);
+      const content = oneclickMastersSecondary?.[key]?.content;
+      if (content) return content;
+    }
+    
+    return null;
+  };
+
+  // ========== 원클릭 1차 교육 (원본 화면) ==========
+  const getOneclickPrimaryEducation = () => {
+    if (!isFullTransform) return null;
+    
+    const category = selectedStyle?.category;
+    
+    // 동양화
+    if (category === 'oriental') {
+      return {
+        title: '동양 전통회화 3개국 여행',
+        content: '한국의 여백, 중국의 기운생동, 일본의 부세(浮世).\n세 나라가 붓 하나로 빚어낸 서로 다른 아름다움을 만나보세요.'
+      };
+    }
+    
+    // 사조
+    if (category === 'movements') {
+      return {
+        title: '2,500년 서양미술사 관통',
+        content: '그리스 조각부터 팝아트까지.\n인류가 아름다움을 추구해온 긴 여정을 따라가 보세요.'
+      };
+    }
+    
+    // 거장
+    if (category === 'masters') {
+      return {
+        title: '7인의 거장과 만남',
+        content: '고흐의 열정, 클림트의 황금빛, 피카소의 해체.\n미술사를 바꾼 거장들의 시선으로 당신을 그려드립니다.'
+      };
+    }
+    
+    return null;
+  };
+
 
   // ========== 저장 ==========
   const handleDownload = async () => {
@@ -1995,12 +2099,21 @@ const ResultScreen = ({
           </p>
         </div>
 
-        {/* 원클릭: 원본 사진 (currentIndex === -1) */}
+        {/* 원클릭: 원본 사진 + 1차 교육 (currentIndex === -1) */}
         {isFullTransform && currentIndex === -1 && (
-          <div className="result-image-wrapper original-view">
-            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
-            <div className="original-label">원본 사진</div>
-          </div>
+          <>
+            <div className="result-image-wrapper original-view">
+              <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+              <div className="original-label">원본 사진</div>
+            </div>
+            {/* 원클릭 1차 교육 */}
+            {getOneclickPrimaryEducation() && (
+              <div className="edu-card single-primary">
+                <h4>{getOneclickPrimaryEducation().title}</h4>
+                <p>{getOneclickPrimaryEducation().content}</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* 원클릭: 변환 결과 (currentIndex >= 0) */}
@@ -2010,19 +2123,36 @@ const ResultScreen = ({
           </div>
         )}
 
-        {/* 단일 변환: 원본 사진 (singleViewIndex === 0) */}
+        {/* 단일 변환: 원본 사진 + 1차 교육 (singleViewIndex === 0) */}
         {!isFullTransform && singleViewIndex === 0 && (
-          <div className="result-image-wrapper original-view">
-            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
-            <div className="original-label">원본 사진</div>
-          </div>
+          <>
+            <div className="result-image-wrapper original-view">
+              <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+              <div className="original-label">원본 사진</div>
+            </div>
+            {/* 단독변환 1차 교육 */}
+            {getSinglePrimaryEducation() && (
+              <div className="edu-card single-primary">
+                <h4>{getSinglePrimaryEducation().title}</h4>
+                <p>{getSinglePrimaryEducation().content}</p>
+              </div>
+            )}
+          </>
         )}
 
-        {/* 단일 변환: 변환 결과 (singleViewIndex === 1) */}
+        {/* 단일 변환: 변환 결과 + 2차 교육 (singleViewIndex === 1) */}
         {!isFullTransform && singleViewIndex === 1 && finalDisplayImage && (
-          <div className="result-image-wrapper">
-            <img src={finalDisplayImage} alt="변환 결과" className="result-image" />
-          </div>
+          <>
+            <div className="result-image-wrapper">
+              <img src={finalDisplayImage} alt="변환 결과" className="result-image" />
+            </div>
+            {/* 단독변환 2차 교육 */}
+            {getSingleSecondaryEducation() && (
+              <div className="edu-card single-secondary">
+                <p>{getSingleSecondaryEducation()}</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* 단독변환 실패 시 다시 시도 버튼 */}
@@ -2137,54 +2267,6 @@ const ResultScreen = ({
           </div>
         )}
 
-        {/* 원클릭 네비게이션 (교육자료 하단) */}
-        {isFullTransform && (
-          <div className="fullTransform-nav">
-            <button 
-              onClick={() => {
-                if (currentIndex > 0) {
-                  setCurrentIndex(i => i - 1);
-                } else if (currentIndex === 0) {
-                  setCurrentIndex(-1);
-                }
-              }}
-              disabled={currentIndex === -1 || isRetrying}
-              className="nav-btn"
-              style={{ opacity: isRetrying ? 0.5 : 1 }}
-            >
-              ◀
-            </button>
-            <div className="nav-dots">
-              {fullTransformResults.map((_, idx) => (
-                <button
-                  key={idx}
-                  className={`nav-dot ${idx === currentIndex ? 'active' : ''}`}
-                  onClick={() => !isRetrying && setCurrentIndex(idx)}
-                  disabled={isRetrying}
-                  style={{ opacity: isRetrying ? 0.5 : 1 }}
-                />
-              ))}
-              <span className="progress-counter">
-                {currentIndex === -1 ? 0 : currentIndex + 1}/{fullTransformResults.length}
-              </span>
-            </div>
-            <button 
-              onClick={() => {
-                if (currentIndex === -1) {
-                  setCurrentIndex(0);
-                } else if (currentIndex < fullTransformResults.length - 1) {
-                  setCurrentIndex(i => i + 1);
-                }
-              }}
-              disabled={currentIndex === fullTransformResults.length - 1 || isRetrying}
-              className="nav-btn"
-              style={{ opacity: isRetrying ? 0.5 : 1 }}
-            >
-              ▶
-            </button>
-          </div>
-        )}
-
         {/* 단독변환 네비게이션 */}
         {!isFullTransform && finalDisplayImage && (
           <div className="fullTransform-nav">
@@ -2242,8 +2324,8 @@ const ResultScreen = ({
           </div>
         )}
 
-        {/* 거장(AI) 대화 섹션 - 거장 카테고리일 때만 표시 (v68) */}
-        {displayCategory === 'masters' && currentMasterKey && (
+        {/* 거장(AI) 대화 섹션 - 거장 카테고리 + 결과 화면일 때만 표시 (원본 화면 제외) */}
+        {displayCategory === 'masters' && currentMasterKey && currentIndex >= 0 && (
           <MasterChat
             key={currentMasterKey}
             masterKey={currentMasterKey}
@@ -2253,6 +2335,102 @@ const ResultScreen = ({
             savedChatData={masterChatData[currentMasterKey]}
             onChatDataChange={(data) => updateMasterChatData(currentMasterKey, data)}
           />
+        )}
+
+        {/* 원클릭 네비게이션 - 거장일 때 (MasterChat 아래) */}
+        {isFullTransform && displayCategory === 'masters' && (
+          <div className="fullTransform-nav">
+            <button 
+              onClick={() => {
+                if (currentIndex > 0) {
+                  setCurrentIndex(i => i - 1);
+                } else if (currentIndex === 0) {
+                  setCurrentIndex(-1);
+                }
+              }}
+              disabled={currentIndex === -1 || isRetrying}
+              className="nav-btn"
+              style={{ opacity: isRetrying ? 0.5 : 1 }}
+            >
+              ◀
+            </button>
+            <div className="nav-dots">
+              {fullTransformResults.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`nav-dot ${idx === currentIndex ? 'active' : ''}`}
+                  onClick={() => !isRetrying && setCurrentIndex(idx)}
+                  disabled={isRetrying}
+                  style={{ opacity: isRetrying ? 0.5 : 1 }}
+                />
+              ))}
+              <span className="progress-counter">
+                {currentIndex === -1 ? 0 : currentIndex + 1}/{fullTransformResults.length}
+              </span>
+            </div>
+            <button 
+              onClick={() => {
+                if (currentIndex === -1) {
+                  setCurrentIndex(0);
+                } else if (currentIndex < fullTransformResults.length - 1) {
+                  setCurrentIndex(i => i + 1);
+                }
+              }}
+              disabled={currentIndex === fullTransformResults.length - 1 || isRetrying}
+              className="nav-btn"
+              style={{ opacity: isRetrying ? 0.5 : 1 }}
+            >
+              ▶
+            </button>
+          </div>
+        )}
+
+        {/* 원클릭 네비게이션 (Action Buttons 바로 위) */}
+        {isFullTransform && (
+          <div className="fullTransform-nav">
+            <button 
+              onClick={() => {
+                if (currentIndex > 0) {
+                  setCurrentIndex(i => i - 1);
+                } else if (currentIndex === 0) {
+                  setCurrentIndex(-1);
+                }
+              }}
+              disabled={currentIndex === -1 || isRetrying}
+              className="nav-btn"
+              style={{ opacity: isRetrying ? 0.5 : 1 }}
+            >
+              ◀
+            </button>
+            <div className="nav-dots">
+              {fullTransformResults.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`nav-dot ${idx === currentIndex ? 'active' : ''}`}
+                  onClick={() => !isRetrying && setCurrentIndex(idx)}
+                  disabled={isRetrying}
+                  style={{ opacity: isRetrying ? 0.5 : 1 }}
+                />
+              ))}
+              <span className="progress-counter">
+                {currentIndex === -1 ? 0 : currentIndex + 1}/{fullTransformResults.length}
+              </span>
+            </div>
+            <button 
+              onClick={() => {
+                if (currentIndex === -1) {
+                  setCurrentIndex(0);
+                } else if (currentIndex < fullTransformResults.length - 1) {
+                  setCurrentIndex(i => i + 1);
+                }
+              }}
+              disabled={currentIndex === fullTransformResults.length - 1 || isRetrying}
+              className="nav-btn"
+              style={{ opacity: isRetrying ? 0.5 : 1 }}
+            >
+              ▶
+            </button>
+          </div>
         )}
 
         {/* Action Buttons */}
@@ -2781,6 +2959,41 @@ const ResultScreen = ({
         .result-image {
           width: 100%;
           display: block;
+        }
+        
+        /* 단독변환 교육 카드 */
+        .edu-card.single-primary {
+          background: linear-gradient(135deg, #f0f4ff, #e8efff);
+          border-left: 3px solid #667eea;
+          padding: 16px;
+          border-radius: 10px;
+          margin: 16px 0;
+        }
+        .edu-card.single-primary h4 {
+          color: #667eea;
+          margin: 0 0 8px;
+          font-size: 15px;
+        }
+        .edu-card.single-primary p {
+          color: #333;
+          line-height: 1.6;
+          font-size: 13px;
+          margin: 0;
+          white-space: pre-line;
+        }
+        .edu-card.single-secondary {
+          background: linear-gradient(135deg, #f0fff0, #e5ffe5);
+          border-left: 3px solid #4CAF50;
+          padding: 16px;
+          border-radius: 10px;
+          margin: 16px 0;
+        }
+        .edu-card.single-secondary p {
+          color: #333;
+          line-height: 1.6;
+          font-size: 13px;
+          margin: 0;
+          white-space: pre-line;
         }
       `}</style>
     </div>

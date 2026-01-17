@@ -186,7 +186,13 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
     const workName = result.selected_work || '';
     const resultCategory = result.style?.category;
     
-    const key = getEducationKey(resultCategory, artistName, workName);
+    // 객체로 전달 (educationMatcher.js 방식)
+    const key = getEducationKey(resultCategory, {
+      aiSelectedArtist: artistName,
+      selected_work: workName,
+      styleId: result.style?.id,
+      masterId: result.style?.id?.replace('-master', '')
+    });
     
     if (key) {
       const educationData = {
