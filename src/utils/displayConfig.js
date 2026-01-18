@@ -1,15 +1,10 @@
 // ========================================
-// displayConfig.js - 3줄 형식 컨트롤 타워
-// v72 - 2026-01-18
+// displayConfig.js - 매칭 시스템 컨트롤 타워
+// v71 - 2026-01-18
 // ========================================
 // 
-// 모든 키 정규화, 별칭 매핑, 3줄 표시 정보를 한 곳에서 관리
+// 모든 키 정규화, 별칭 매핑, 표시 정보를 한 곳에서 관리
 // API 응답 → 정규화 → 교육자료/UI 표시
-//
-// 3줄 형식:
-// - 거장: 화가명(영문, 생몰) / 사조, 국가 / 대표작 3개
-// - 사조: 사조(영문, 시기) / 대표화가 3명 / 역사적 배경
-// - 동양화: 국가 전통회화(영문) / 스타일들 / 한 줄 설명
 //
 // ========================================
 
@@ -86,49 +81,49 @@ export const STANDARD_KEYS = {
 // 어떤 입력이든 → 표준 키로 변환
 export const ALIASES = {
   // ===== 사조 별칭 =====
+  // 그리스·로마
   'ancient': 'greco-roman',
   'ancient-art': 'greco-roman',
   'greek-roman': 'greco-roman',
   'greco-roman': 'greco-roman',
-  '고대': 'greco-roman',
-  '그리스로마': 'greco-roman',
   
+  // 중세
   'medieval': 'medieval-art',
   'medieval-art': 'medieval-art',
-  '중세': 'medieval-art',
   
+  // 르네상스
   'renaissance': 'renaissance',
-  '르네상스': 'renaissance',
   
+  // 바로크
   'baroque': 'baroque',
-  '바로크': 'baroque',
   
+  // 로코코
   'rococo': 'rococo',
-  '로코코': 'rococo',
   
+  // 신고전·낭만·사실
   'neoclassicism_vs_romanticism_vs_realism': 'neoclassicism-romanticism-realism',
   'neoclassicism-romanticism-realism': 'neoclassicism-romanticism-realism',
   'neoclassicism': 'neoclassicism-romanticism-realism',
-  '신고전': 'neoclassicism-romanticism-realism',
   
+  // 인상주의
   'impressionism': 'impressionism',
-  '인상주의': 'impressionism',
   
+  // 후기인상주의
   'postImpressionism': 'post-impressionism',
   'post-impressionism': 'post-impressionism',
   'postimpressionism': 'post-impressionism',
-  '후기인상주의': 'post-impressionism',
   
+  // 야수파
   'fauvism': 'fauvism',
-  '야수파': 'fauvism',
   
+  // 표현주의
   'expressionism': 'expressionism',
-  '표현주의': 'expressionism',
   
+  // 모더니즘
   'modernism': 'modernism',
-  '모더니즘': 'modernism',
   
   // ===== 거장 별칭 =====
+  // 반 고흐
   'vangogh': 'vangogh',
   'van gogh': 'vangogh',
   'vincent van gogh': 'vangogh',
@@ -136,104 +131,113 @@ export const ALIASES = {
   '빈센트 반 고흐': 'vangogh',
   'gogh': 'vangogh',
   
+  // 클림트
   'klimt': 'klimt',
   'gustav klimt': 'klimt',
   '클림트': 'klimt',
   '구스타프 클림트': 'klimt',
   
+  // 뭉크
   'munch': 'munch',
   'edvard munch': 'munch',
   '뭉크': 'munch',
   '에드바르 뭉크': 'munch',
   
+  // 마티스
   'matisse': 'matisse',
   'henri matisse': 'matisse',
   '마티스': 'matisse',
   '앙리 마티스': 'matisse',
   
+  // 샤갈
   'chagall': 'chagall',
   'marc chagall': 'chagall',
   '샤갈': 'chagall',
   '마르크 샤갈': 'chagall',
   
+  // 프리다
   'frida': 'frida',
   'frida kahlo': 'frida',
   '프리다': 'frida',
   '프리다 칼로': 'frida',
   
+  // 리히텐슈타인
   'lichtenstein': 'lichtenstein',
   'roy lichtenstein': 'lichtenstein',
   '리히텐슈타인': 'lichtenstein',
   '로이 리히텐슈타인': 'lichtenstein',
   
   // ===== 동양화 별칭 =====
+  // 한국 - 민화
   'korean-minhwa': 'korean-minhwa',
   'korean_minhwa': 'korean-minhwa',
   'korean minhwa': 'korean-minhwa',
-  'koreanminhwa': 'korean-minhwa',
   'minhwa': 'korean-minhwa',
   '민화': 'korean-minhwa',
-  '한국 민화': 'korean-minhwa',
   
+  // 한국 - 풍속도
   'korean-pungsokdo': 'korean-pungsokdo',
   'korean_pungsokdo': 'korean-pungsokdo',
   'korean pungsokdo': 'korean-pungsokdo',
-  'koreanpungsokdo': 'korean-pungsokdo',
   'korean-genre': 'korean-pungsokdo',
   'korean_genre': 'korean-pungsokdo',
+  'korean genre': 'korean-pungsokdo',
   'pungsokdo': 'korean-pungsokdo',
   '풍속도': 'korean-pungsokdo',
-  '한국 풍속도': 'korean-pungsokdo',
   
+  // 한국 - 진경산수
   'korean-jingyeong': 'korean-jingyeong',
   'korean_jingyeong': 'korean-jingyeong',
   'korean jingyeong': 'korean-jingyeong',
-  'koreanjingyeong': 'korean-jingyeong',
   'jingyeong': 'korean-jingyeong',
   '진경산수': 'korean-jingyeong',
-  '한국 진경산수': 'korean-jingyeong',
+  '진경산수화': 'korean-jingyeong',
   
+  // 중국 - 수묵화
   'chinese-ink': 'chinese-ink',
   'chinese_ink': 'chinese-ink',
   'chinese ink': 'chinese-ink',
-  'chineseink': 'chinese-ink',
   'shuimohua': 'chinese-ink',
   '수묵화': 'chinese-ink',
-  '중국 수묵화': 'chinese-ink',
   
+  // 중국 - 공필화
   'chinese-gongbi': 'chinese-gongbi',
   'chinese_gongbi': 'chinese-gongbi',
   'chinese gongbi': 'chinese-gongbi',
-  'chinesegongbi': 'chinese-gongbi',
   'gongbi': 'chinese-gongbi',
   '공필화': 'chinese-gongbi',
-  '중국 공필화': 'chinese-gongbi',
   
+  // 일본 - 우키요에
   'japanese-ukiyoe': 'japanese-ukiyoe',
   'japanese_ukiyoe': 'japanese-ukiyoe',
   'japanese ukiyoe': 'japanese-ukiyoe',
-  'japaneseukiyoe': 'japanese-ukiyoe',
+  'japanese ukiyo-e': 'japanese-ukiyoe',
+  'japanese-ukiyo-e': 'japanese-ukiyoe',
   'ukiyoe': 'japanese-ukiyoe',
+  'ukiyo-e': 'japanese-ukiyoe',
   '우키요에': 'japanese-ukiyoe',
-  '일본 우키요에': 'japanese-ukiyoe',
-  '일본우키요에': 'japanese-ukiyoe',
   
   // ===== 화가 별칭 (37명) =====
+  // 그리스·로마
   'classical sculpture': 'classical-sculpture',
   'classical-sculpture': 'classical-sculpture',
   'ancient-greek-sculpture': 'classical-sculpture',
+  'ancient greek sculpture': 'classical-sculpture',
   '고대 그리스 조각': 'classical-sculpture',
-  '그리스 조각': 'classical-sculpture',
   
   'roman mosaic': 'roman-mosaic',
   'roman-mosaic': 'roman-mosaic',
   '로마 모자이크': 'roman-mosaic',
   
+  // 중세
   'byzantine': 'byzantine',
+  'byzantine art': 'byzantine',
   '비잔틴': 'byzantine',
   '비잔틴 미술': 'byzantine',
   
   'gothic': 'gothic',
+  'gothic art': 'gothic',
+  'gothic stained glass': 'gothic',
   '고딕': 'gothic',
   '고딕 미술': 'gothic',
   
@@ -241,117 +245,192 @@ export const ALIASES = {
   'islamic-miniature': 'islamic-miniature',
   '이슬람 세밀화': 'islamic-miniature',
   
+  // 르네상스
   'leonardo': 'leonardo',
   'leonardo da vinci': 'leonardo',
   '레오나르도': 'leonardo',
   '다빈치': 'leonardo',
+  '레오나르도 다 빈치': 'leonardo',
   
   'michelangelo': 'michelangelo',
+  'michelangelo buonarroti': 'michelangelo',
   '미켈란젤로': 'michelangelo',
+  '미켈란젤로 부오나로티': 'michelangelo',
   
   'raphael': 'raphael',
+  'raffaello sanzio': 'raphael',
+  'raphael sanzio': 'raphael',
   '라파엘로': 'raphael',
   '라파엘': 'raphael',
+  '라파엘로 산치오': 'raphael',
   
   'botticelli': 'botticelli',
   'sandro botticelli': 'botticelli',
   '보티첼리': 'botticelli',
+  '산드로 보티첼리': 'botticelli',
   
   'titian': 'titian',
+  'tiziano vecellio': 'titian',
   '티치아노': 'titian',
+  '티치아노 베첼리오': 'titian',
   
+  // 바로크
   'caravaggio': 'caravaggio',
+  'michelangelo merisi da caravaggio': 'caravaggio',
   '카라바조': 'caravaggio',
+  '미켈란젤로 메리시 다 카라바조': 'caravaggio',
   
   'rembrandt': 'rembrandt',
+  'rembrandt van rijn': 'rembrandt',
   '렘브란트': 'rembrandt',
+  '렘브란트 판 레인': 'rembrandt',
   
   'velazquez': 'velazquez',
   'velázquez': 'velazquez',
+  'diego velazquez': 'velazquez',
+  'diego velázquez': 'velazquez',
   '벨라스케스': 'velazquez',
+  '디에고 벨라스케스': 'velazquez',
   
   'rubens': 'rubens',
+  'peter paul rubens': 'rubens',
   '루벤스': 'rubens',
+  '페테르 파울 루벤스': 'rubens',
   
+  // 로코코
   'watteau': 'watteau',
+  'jean-antoine watteau': 'watteau',
+  'jean antoine watteau': 'watteau',
   '와토': 'watteau',
+  '장 앙투안 와토': 'watteau',
   
   'boucher': 'boucher',
   'françois boucher': 'boucher',
   'francois boucher': 'boucher',
   '부셰': 'boucher',
+  '프랑수아 부셰': 'boucher',
   
+  // 신고전·낭만·사실
   'david': 'david',
   'jacques-louis david': 'david',
+  'jacques louis david': 'david',
   '다비드': 'david',
+  '자크 루이 다비드': 'david',
   
   'ingres': 'ingres',
+  'jean-auguste-dominique ingres': 'ingres',
+  'jean auguste dominique ingres': 'ingres',
   '앵그르': 'ingres',
+  '장 오귀스트 도미니크 앵그르': 'ingres',
   
   'turner': 'turner',
+  'j.m.w. turner': 'turner',
+  'joseph mallord william turner': 'turner',
   '터너': 'turner',
+  '조지프 말로드 윌리엄 터너': 'turner',
   
   'delacroix': 'delacroix',
+  'eugène delacroix': 'delacroix',
+  'eugene delacroix': 'delacroix',
   '들라크루아': 'delacroix',
+  '외젠 들라크루아': 'delacroix',
   
   'courbet': 'courbet',
+  'gustave courbet': 'courbet',
   '쿠르베': 'courbet',
+  '귀스타브 쿠르베': 'courbet',
   
   'manet': 'manet',
   'édouard manet': 'manet',
   'edouard manet': 'manet',
   '마네': 'manet',
+  '에두아르 마네': 'manet',
   
+  // 인상주의
   'monet': 'monet',
   'claude monet': 'monet',
   '모네': 'monet',
+  '클로드 모네': 'monet',
   
   'renoir': 'renoir',
   'pierre-auguste renoir': 'renoir',
-  'auguste renoir': 'renoir',
+  'pierre auguste renoir': 'renoir',
   '르누아르': 'renoir',
+  '피에르 오귀스트 르누아르': 'renoir',
   
   'degas': 'degas',
+  'edgar degas': 'degas',
   '드가': 'degas',
+  '에드가 드가': 'degas',
   
   'caillebotte': 'caillebotte',
+  'gustave caillebotte': 'caillebotte',
   '카유보트': 'caillebotte',
+  '귀스타브 카유보트': 'caillebotte',
   
+  // 후기인상주의
   'gauguin': 'gauguin',
+  'paul gauguin': 'gauguin',
   '고갱': 'gauguin',
+  '폴 고갱': 'gauguin',
   
   'cezanne': 'cezanne',
+  'cézanne': 'cezanne',
+  'paul cezanne': 'cezanne',
+  'paul cézanne': 'cezanne',
   '세잔': 'cezanne',
+  '폴 세잔': 'cezanne',
   
+  // 야수파
   'derain': 'derain',
+  'andré derain': 'derain',
+  'andre derain': 'derain',
   '드랭': 'derain',
+  '앙드레 드랭': 'derain',
   
   'vlaminck': 'vlaminck',
+  'maurice de vlaminck': 'vlaminck',
   '블라맹크': 'vlaminck',
+  '모리스 드 블라맹크': 'vlaminck',
   
+  // 표현주의
   'kirchner': 'kirchner',
   'ernst ludwig kirchner': 'kirchner',
   '키르히너': 'kirchner',
+  '에른스트 루트비히 키르히너': 'kirchner',
   
   'kokoschka': 'kokoschka',
+  'oskar kokoschka': 'kokoschka',
   '코코슈카': 'kokoschka',
+  '오스카 코코슈카': 'kokoschka',
   
+  // 모더니즘
   'picasso': 'picasso',
+  'pablo picasso': 'picasso',
   '피카소': 'picasso',
+  '파블로 피카소': 'picasso',
   
   'magritte': 'magritte',
+  'rené magritte': 'magritte',
+  'rene magritte': 'magritte',
   '마그리트': 'magritte',
+  '르네 마그리트': 'magritte',
   
   'miro': 'miro',
-  '미로': 'miro'
+  'miró': 'miro',
+  'joan miro': 'miro',
+  'joan miró': 'miro',
+  '미로': 'miro',
+  '호안 미로': 'miro'
 };
 
 // ========================================
-// 3. 키 정규화 함수
+// 3. 정규화 함수
 // ========================================
 export function normalizeKey(input) {
-  if (!input) return '';
+  if (!input) return null;
   
+  // 소문자 변환 + 앞뒤 공백 제거
   const lower = input.toLowerCase().trim();
   
   // 별칭 테이블에서 찾기
@@ -370,354 +449,190 @@ export function normalizeKey(input) {
 }
 
 // ========================================
-// 4. 3줄 표시 정보 (THREE_LINE_DISPLAY)
+// 4. 표시 정보 (DISPLAY_INFO)
 // ========================================
-// 변환중 화면 + 결과 화면 통일
-
-export const THREE_LINE_DISPLAY = {
-  // ===== 거장 (7명) =====
-  // 1줄: 화가명(영문, 생몰)
-  // 2줄: 사조, 국가
-  // 3줄: 대표작 3개
-  masters: {
-    'vangogh': {
-      line1: '빈센트 반 고흐(Vincent van Gogh, 1853~1890)',
-      line2: '후기인상주의, 네덜란드',
-      line3: '별이 빛나는 밤 · 해바라기 · 아를의 침실'
-    },
-    'klimt': {
-      line1: '구스타프 클림트(Gustav Klimt, 1862~1918)',
-      line2: '아르누보, 오스트리아',
-      line3: '키스 · 아델레 블로흐-바우어의 초상 · 생명의 나무'
-    },
-    'munch': {
-      line1: '에드바르 뭉크(Edvard Munch, 1863~1944)',
-      line2: '표현주의, 노르웨이',
-      line3: '절규 · 마돈나 · 사춘기'
-    },
-    'matisse': {
-      line1: '앙리 마티스(Henri Matisse, 1869~1954)',
-      line2: '야수파, 프랑스',
-      line3: '춤 · 붉은 방 · 푸른 누드'
-    },
-    'chagall': {
-      line1: '마르크 샤갈(Marc Chagall, 1887~1985)',
-      line2: '초현실주의, 러시아/프랑스',
-      line3: '마을 위에서 · 나와 마을 · 생일'
-    },
-    'frida': {
-      line1: '프리다 칼로(Frida Kahlo, 1907~1954)',
-      line2: '초현실주의, 멕시코',
-      line3: '부러진 기둥 · 가시목걸이 자화상 · 헨리 포드 병원'
-    },
-    'lichtenstein': {
-      line1: '로이 리히텐슈타인(Roy Lichtenstein, 1923~1997)',
-      line2: '팝아트, 미국',
-      line3: 'Whaam! · 익사하는 소녀 · 행복한 눈물'
-    }
-  },
-  
-  // ===== 사조 (11개) =====
-  // 1줄: 사조(영문, 시기)
-  // 2줄: 대표화가 3명
-  // 3줄: 역사적 배경
+// 로딩 화면, 결과 화면에서 사용할 제목/부제목
+export const DISPLAY_INFO = {
+  // ===== 사조 =====
   movements: {
     'greco-roman': {
-      line1: '그리스·로마(Greco-Roman, BC~AD 4세기)',
-      line2: '그리스 조각 · 로마 모자이크',
-      line3: '민주주의 탄생, 올림픽 시작'
+      loading: { title: '고대 그리스·로마', subtitle: '고대 그리스 조각 · 로마 모자이크' },
+      result: { title: '고대 그리스·로마' }
     },
     'medieval-art': {
-      line1: '중세 미술(Medieval, 5~15세기)',
-      line2: '비잔틴 · 고딕 · 이슬람 세밀화',
-      line3: '기독교 확산, 십자군 전쟁'
+      loading: { title: '중세 미술', subtitle: '비잔틴 · 고딕 · 이슬람 세밀화' },
+      result: { title: '중세 미술' }
     },
     'renaissance': {
-      line1: '르네상스(Renaissance, 14~16세기)',
-      line2: '다빈치 · 미켈란젤로 · 보티첼리',
-      line3: '인문주의 부흥, 종교개혁'
+      loading: { title: '르네상스', subtitle: '다빈치 · 미켈란젤로 · 보티첼리' },
+      result: { title: '르네상스' }
     },
     'baroque': {
-      line1: '바로크(Baroque, 17~18세기)',
-      line2: '카라바조 · 렘브란트 · 벨라스케스',
-      line3: '반종교개혁, 절대왕정'
+      loading: { title: '바로크', subtitle: '카라바조 · 렘브란트 · 벨라스케스' },
+      result: { title: '바로크' }
     },
     'rococo': {
-      line1: '로코코(Rococo, 18세기)',
-      line2: '와토 · 부셰 · 프라고나르',
-      line3: '귀족 문화의 절정'
+      loading: { title: '로코코', subtitle: '와토 · 부셰' },
+      result: { title: '로코코' }
     },
     'neoclassicism-romanticism-realism': {
-      line1: '신고전·낭만·사실주의(18~19세기)',
-      line2: '다비드 · 들라크루아 · 쿠르베',
-      line3: '프랑스 혁명, 산업혁명'
+      loading: { title: '신고전·낭만·사실주의', subtitle: '다비드 · 들라크루아 · 쿠르베' },
+      result: { title: '신고전·낭만·사실주의' }
     },
     'impressionism': {
-      line1: '인상주의(Impressionism, 19세기 후반)',
-      line2: '모네 · 르누아르 · 드가',
-      line3: '사진의 발명, 튜브 물감 발명'
+      loading: { title: '인상주의', subtitle: '모네 · 르누아르 · 드가' },
+      result: { title: '인상주의' }
     },
     'post-impressionism': {
-      line1: '후기인상주의(Post-Impressionism, 19세기 말)',
-      line2: '반 고흐 · 고갱 · 세잔',
-      line3: '인상주의의 한계, 개인 표현 추구'
+      loading: { title: '후기인상주의', subtitle: '반 고흐 · 고갱 · 세잔' },
+      result: { title: '후기인상주의' }
     },
     'fauvism': {
-      line1: '야수파(Fauvism, 20세기 초)',
-      line2: '마티스 · 드랭 · 블라맹크',
-      line3: '색채 해방, 아카데미 반발'
+      loading: { title: '야수파', subtitle: '마티스 · 드랭 · 블라맹크' },
+      result: { title: '야수파' }
     },
     'expressionism': {
-      line1: '표현주의(Expressionism, 20세기 초)',
-      line2: '뭉크 · 키르히너 · 코코슈카',
-      line3: '1차 세계대전 전야, 산업화 불안'
+      loading: { title: '표현주의', subtitle: '뭉크 · 키르히너 · 코코슈카' },
+      result: { title: '표현주의' }
     },
     'modernism': {
-      line1: '모더니즘(Modernism, 20세기)',
-      line2: '피카소 · 마그리트 · 샤갈',
-      line3: '세계대전, 과학기술 발전'
+      loading: { title: '모더니즘', subtitle: '피카소 · 마그리트 · 샤갈' },
+      result: { title: '모더니즘' }
     }
   },
   
-  // ===== 동양화 (3개 국가) =====
-  // 1줄: 국가 전통회화(영문)
-  // 2줄: 스타일들
-  // 3줄: 한 줄 설명
+  // ===== 거장 =====
+  masters: {
+    'vangogh': {
+      loading: { title: '빈센트 반 고흐', subtitle: 'Vincent van Gogh' },
+      result: { title: '반 고흐' }
+    },
+    'klimt': {
+      loading: { title: '구스타프 클림트', subtitle: 'Gustav Klimt' },
+      result: { title: '클림트' }
+    },
+    'munch': {
+      loading: { title: '에드바르 뭉크', subtitle: 'Edvard Munch' },
+      result: { title: '뭉크' }
+    },
+    'matisse': {
+      loading: { title: '앙리 마티스', subtitle: 'Henri Matisse' },
+      result: { title: '마티스' }
+    },
+    'chagall': {
+      loading: { title: '마르크 샤갈', subtitle: 'Marc Chagall' },
+      result: { title: '샤갈' }
+    },
+    'frida': {
+      loading: { title: '프리다 칼로', subtitle: 'Frida Kahlo' },
+      result: { title: '프리다' }
+    },
+    'lichtenstein': {
+      loading: { title: '로이 리히텐슈타인', subtitle: 'Roy Lichtenstein' },
+      result: { title: '리히텐슈타인' }
+    }
+  },
+  
+  // ===== 동양화 =====
   oriental: {
-    // 한국 (3개 스타일 공통)
     'korean-minhwa': {
-      line1: '한국 전통회화(Korean Traditional Painting)',
-      line2: '민화 · 풍속도 · 진경산수',
-      line3: '복과 장수, 서민의 삶, 조선의 산수'
+      loading: { title: '한국 민화', subtitle: 'Korean Folk Painting' },
+      result: { title: '민화' }
     },
     'korean-pungsokdo': {
-      line1: '한국 전통회화(Korean Traditional Painting)',
-      line2: '민화 · 풍속도 · 진경산수',
-      line3: '복과 장수, 서민의 삶, 조선의 산수'
+      loading: { title: '한국 풍속도', subtitle: 'Korean Genre Painting' },
+      result: { title: '풍속도' }
     },
     'korean-jingyeong': {
-      line1: '한국 전통회화(Korean Traditional Painting)',
-      line2: '민화 · 풍속도 · 진경산수',
-      line3: '복과 장수, 서민의 삶, 조선의 산수'
+      loading: { title: '한국 진경산수', subtitle: 'Korean True-View Landscape' },
+      result: { title: '진경산수' }
     },
-    // 중국 (2개 스타일 공통)
     'chinese-ink': {
-      line1: '중국 전통회화(Chinese Traditional Painting)',
-      line2: '수묵화 · 공필화',
-      line3: '먹의 농담과 섬세한 궁정 회화'
+      loading: { title: '중국 수묵화', subtitle: 'Chinese Ink Painting' },
+      result: { title: '수묵화' }
     },
     'chinese-gongbi': {
-      line1: '중국 전통회화(Chinese Traditional Painting)',
-      line2: '수묵화 · 공필화',
-      line3: '먹의 농담과 섬세한 궁정 회화'
+      loading: { title: '중국 공필화', subtitle: 'Chinese Gongbi' },
+      result: { title: '공필화' }
     },
-    // 일본 (1개 스타일)
     'japanese-ukiyoe': {
-      line1: '일본 전통회화(Japanese Traditional Painting)',
-      line2: '우키요에',
-      line3: '떠다니는 세상, 목판화의 예술'
+      loading: { title: '일본 우키요에', subtitle: 'Japanese Ukiyo-e' },
+      result: { title: '우키요에' }
     }
   },
   
-  // ===== 사조별 화가 (37명) =====
-  // 사조 변환 시 AI가 선택한 화가 표시용
-  // 1줄: 사조(영문, 시기) - 부모 사조에서 가져옴
-  // 2줄: 화가명(영문)
-  // 3줄: 역사적 배경 - 부모 사조에서 가져옴
+  // ===== 화가 (37명) =====
   artists: {
     // 그리스·로마
-    'classical-sculpture': {
-      name: '그리스 조각',
-      fullName: '그리스 조각(Classical Sculpture)',
-      parentMovement: 'greco-roman'
-    },
-    'roman-mosaic': {
-      name: '로마 모자이크',
-      fullName: '로마 모자이크(Roman Mosaic)',
-      parentMovement: 'greco-roman'
-    },
+    'classical-sculpture': { name: '고대 그리스 조각', fullName: 'Ancient Greek Sculpture' },
+    'roman-mosaic': { name: '로마 모자이크', fullName: 'Roman Mosaic' },
+    
     // 중세
-    'byzantine': {
-      name: '비잔틴',
-      fullName: '비잔틴(Byzantine)',
-      parentMovement: 'medieval-art'
-    },
-    'gothic': {
-      name: '고딕',
-      fullName: '고딕(Gothic)',
-      parentMovement: 'medieval-art'
-    },
-    'islamic-miniature': {
-      name: '이슬람 세밀화',
-      fullName: '이슬람 세밀화(Islamic Miniature)',
-      parentMovement: 'medieval-art'
-    },
+    'byzantine': { name: '비잔틴 미술', fullName: 'Byzantine Art' },
+    'gothic': { name: '고딕 미술', fullName: 'Gothic Art' },
+    'islamic-miniature': { name: '이슬람 세밀화', fullName: 'Islamic Miniature' },
+    
     // 르네상스
-    'leonardo': {
-      name: '레오나르도 다 빈치',
-      fullName: '레오나르도 다 빈치(Leonardo da Vinci)',
-      parentMovement: 'renaissance'
-    },
-    'michelangelo': {
-      name: '미켈란젤로',
-      fullName: '미켈란젤로(Michelangelo)',
-      parentMovement: 'renaissance'
-    },
-    'raphael': {
-      name: '라파엘로',
-      fullName: '라파엘로(Raphael)',
-      parentMovement: 'renaissance'
-    },
-    'botticelli': {
-      name: '보티첼리',
-      fullName: '보티첼리(Botticelli)',
-      parentMovement: 'renaissance'
-    },
-    'titian': {
-      name: '티치아노',
-      fullName: '티치아노(Titian)',
-      parentMovement: 'renaissance'
-    },
+    'leonardo': { name: '레오나르도 다 빈치', fullName: 'Leonardo da Vinci' },
+    'michelangelo': { name: '미켈란젤로', fullName: 'Michelangelo Buonarroti' },
+    'raphael': { name: '라파엘로', fullName: 'Raphael Sanzio' },
+    'botticelli': { name: '보티첼리', fullName: 'Sandro Botticelli' },
+    'titian': { name: '티치아노', fullName: 'Titian' },
+    
     // 바로크
-    'caravaggio': {
-      name: '카라바조',
-      fullName: '카라바조(Caravaggio)',
-      parentMovement: 'baroque'
-    },
-    'rembrandt': {
-      name: '렘브란트',
-      fullName: '렘브란트(Rembrandt)',
-      parentMovement: 'baroque'
-    },
-    'velazquez': {
-      name: '벨라스케스',
-      fullName: '벨라스케스(Velázquez)',
-      parentMovement: 'baroque'
-    },
-    'rubens': {
-      name: '루벤스',
-      fullName: '루벤스(Rubens)',
-      parentMovement: 'baroque'
-    },
+    'caravaggio': { name: '카라바조', fullName: 'Caravaggio' },
+    'rembrandt': { name: '렘브란트', fullName: 'Rembrandt van Rijn' },
+    'velazquez': { name: '벨라스케스', fullName: 'Diego Velázquez' },
+    'rubens': { name: '루벤스', fullName: 'Peter Paul Rubens' },
+    
     // 로코코
-    'watteau': {
-      name: '와토',
-      fullName: '와토(Watteau)',
-      parentMovement: 'rococo'
-    },
-    'boucher': {
-      name: '부셰',
-      fullName: '부셰(Boucher)',
-      parentMovement: 'rococo'
-    },
+    'watteau': { name: '와토', fullName: 'Jean-Antoine Watteau' },
+    'boucher': { name: '부셰', fullName: 'François Boucher' },
+    
     // 신고전·낭만·사실
-    'david': {
-      name: '다비드',
-      fullName: '다비드(David)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
-    'ingres': {
-      name: '앵그르',
-      fullName: '앵그르(Ingres)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
-    'turner': {
-      name: '터너',
-      fullName: '터너(Turner)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
-    'delacroix': {
-      name: '들라크루아',
-      fullName: '들라크루아(Delacroix)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
-    'courbet': {
-      name: '쿠르베',
-      fullName: '쿠르베(Courbet)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
-    'manet': {
-      name: '마네',
-      fullName: '마네(Manet)',
-      parentMovement: 'neoclassicism-romanticism-realism'
-    },
+    'david': { name: '다비드', fullName: 'Jacques-Louis David' },
+    'ingres': { name: '앵그르', fullName: 'Jean-Auguste-Dominique Ingres' },
+    'turner': { name: '터너', fullName: 'J.M.W. Turner' },
+    'delacroix': { name: '들라크루아', fullName: 'Eugène Delacroix' },
+    'courbet': { name: '쿠르베', fullName: 'Gustave Courbet' },
+    'manet': { name: '마네', fullName: 'Édouard Manet' },
+    
     // 인상주의
-    'monet': {
-      name: '모네',
-      fullName: '모네(Monet)',
-      parentMovement: 'impressionism'
-    },
-    'renoir': {
-      name: '르누아르',
-      fullName: '르누아르(Renoir)',
-      parentMovement: 'impressionism'
-    },
-    'degas': {
-      name: '드가',
-      fullName: '드가(Degas)',
-      parentMovement: 'impressionism'
-    },
-    'caillebotte': {
-      name: '카유보트',
-      fullName: '카유보트(Caillebotte)',
-      parentMovement: 'impressionism'
-    },
+    'monet': { name: '모네', fullName: 'Claude Monet' },
+    'renoir': { name: '르누아르', fullName: 'Pierre-Auguste Renoir' },
+    'degas': { name: '드가', fullName: 'Edgar Degas' },
+    'caillebotte': { name: '카유보트', fullName: 'Gustave Caillebotte' },
+    
     // 후기인상주의
-    'gauguin': {
-      name: '고갱',
-      fullName: '고갱(Gauguin)',
-      parentMovement: 'post-impressionism'
-    },
-    'cezanne': {
-      name: '세잔',
-      fullName: '세잔(Cézanne)',
-      parentMovement: 'post-impressionism'
-    },
+    'vangogh': { name: '반 고흐', fullName: 'Vincent van Gogh' },
+    'gauguin': { name: '고갱', fullName: 'Paul Gauguin' },
+    'cezanne': { name: '세잔', fullName: 'Paul Cézanne' },
+    
     // 야수파
-    'derain': {
-      name: '드랭',
-      fullName: '드랭(Derain)',
-      parentMovement: 'fauvism'
-    },
-    'vlaminck': {
-      name: '블라맹크',
-      fullName: '블라맹크(Vlaminck)',
-      parentMovement: 'fauvism'
-    },
+    'matisse': { name: '마티스', fullName: 'Henri Matisse' },
+    'derain': { name: '드랭', fullName: 'André Derain' },
+    'vlaminck': { name: '블라맹크', fullName: 'Maurice de Vlaminck' },
+    
     // 표현주의
-    'kirchner': {
-      name: '키르히너',
-      fullName: '키르히너(Kirchner)',
-      parentMovement: 'expressionism'
-    },
-    'kokoschka': {
-      name: '코코슈카',
-      fullName: '코코슈카(Kokoschka)',
-      parentMovement: 'expressionism'
-    },
+    'munch': { name: '뭉크', fullName: 'Edvard Munch' },
+    'kirchner': { name: '키르히너', fullName: 'Ernst Ludwig Kirchner' },
+    'kokoschka': { name: '코코슈카', fullName: 'Oskar Kokoschka' },
+    
     // 모더니즘
-    'picasso': {
-      name: '피카소',
-      fullName: '피카소(Picasso)',
-      parentMovement: 'modernism'
-    },
-    'magritte': {
-      name: '마그리트',
-      fullName: '마그리트(Magritte)',
-      parentMovement: 'modernism'
-    },
-    'miro': {
-      name: '미로',
-      fullName: '미로(Miró)',
-      parentMovement: 'modernism'
-    }
+    'picasso': { name: '피카소', fullName: 'Pablo Picasso' },
+    'magritte': { name: '마그리트', fullName: 'René Magritte' },
+    'miro': { name: '미로', fullName: 'Joan Miró' },
+    'chagall': { name: '샤갈', fullName: 'Marc Chagall' },
+    'lichtenstein': { name: '리히텐슈타인', fullName: 'Roy Lichtenstein' }
   }
 };
 
 // ========================================
 // 5. 교육자료 키 매핑
 // ========================================
+// 어떤 교육자료 파일의 어떤 키를 사용할지
 export const EDUCATION_KEY_MAP = {
+  // 사조 → movementsEducation.js 키
   movements: {
     'greco-roman': 'greco-roman',
     'medieval-art': 'medieval-art',
@@ -731,6 +646,8 @@ export const EDUCATION_KEY_MAP = {
     'expressionism': 'expressionism',
     'modernism': 'modernism'
   },
+  
+  // 거장 → mastersEducation.js 키
   masters: {
     'vangogh': 'vangogh',
     'klimt': 'klimt',
@@ -740,6 +657,8 @@ export const EDUCATION_KEY_MAP = {
     'frida': 'frida',
     'lichtenstein': 'lichtenstein'
   },
+  
+  // 동양화 → orientalEducation.js 키
   oriental: {
     'korean-minhwa': 'korean-minhwa',
     'korean-pungsokdo': 'korean-pungsokdo',
@@ -755,52 +674,32 @@ export const EDUCATION_KEY_MAP = {
 // ========================================
 
 /**
- * 3줄 표시 정보 가져오기
+ * 표시 정보 가져오기
  * @param {string} category - 'movements' | 'masters' | 'oriental'
- * @param {string} key - 정규화 전/후 키
- * @param {string} artistKey - (사조 변환 시) AI가 선택한 화가 키
- * @returns {object} { line1, line2, line3 }
+ * @param {string} key - 정규화된 키
+ * @param {string} screen - 'loading' | 'result'
  */
-export function getThreeLineDisplay(category, key, artistKey = null) {
+export function getDisplayInfo(category, key, screen = 'loading') {
   const normalizedKey = normalizeKey(key);
+  const categoryInfo = DISPLAY_INFO[category];
   
-  // 거장/동양화는 바로 반환
-  if (category === 'masters' || category === 'oriental') {
-    const info = THREE_LINE_DISPLAY[category]?.[normalizedKey];
-    if (info) {
-      return { line1: info.line1, line2: info.line2, line3: info.line3 };
-    }
+  if (!categoryInfo || !categoryInfo[normalizedKey]) {
+    return { title: key, subtitle: '' };
   }
   
-  // 사조: 항상 대표화가 3명 표시 (AI 선택 화가는 교육자료에서 표시)
-  if (category === 'movements') {
-    const movementInfo = THREE_LINE_DISPLAY.movements[normalizedKey];
-    if (!movementInfo) {
-      return { line1: key, line2: '', line3: '' };
-    }
-    
-    // 항상 기본 (대표화가 3명) 반환
-    return {
-      line1: movementInfo.line1,
-      line2: movementInfo.line2,
-      line3: movementInfo.line3
-    };
-  }
-  
-  return { line1: key, line2: '', line3: '' };
+  return categoryInfo[normalizedKey][screen] || { title: key, subtitle: '' };
 }
 
 /**
- * 화가 이름 가져오기 (사조 변환 시 AI 선택 화가)
- * @param {string} artistKey - 화가 키
- * @returns {object} { name, fullName, parentMovement }
+ * 화가 이름 가져오기
+ * @param {string} artistKey - 화가 키 (정규화 전/후 모두 가능)
  */
 export function getArtistName(artistKey) {
   const normalizedKey = normalizeKey(artistKey);
-  const artistInfo = THREE_LINE_DISPLAY.artists[normalizedKey];
+  const artistInfo = DISPLAY_INFO.artists[normalizedKey];
   
   if (!artistInfo) {
-    return { name: artistKey, fullName: artistKey, parentMovement: null };
+    return { name: artistKey, fullName: artistKey };
   }
   
   return artistInfo;
@@ -836,27 +735,14 @@ export function detectCategory(key) {
   return null;
 }
 
-/**
- * (하위 호환성) 기존 getDisplayInfo 대체
- * @deprecated getThreeLineDisplay 사용 권장
- */
-export function getDisplayInfo(category, key, screen = 'loading') {
-  const threeLines = getThreeLineDisplay(category, key);
-  return {
-    title: threeLines.line1,
-    subtitle: threeLines.line2
-  };
-}
-
 export default {
   STANDARD_KEYS,
   ALIASES,
-  THREE_LINE_DISPLAY,
+  DISPLAY_INFO,
   EDUCATION_KEY_MAP,
   normalizeKey,
-  getThreeLineDisplay,
+  getDisplayInfo,
   getArtistName,
   getEducationKey,
-  detectCategory,
-  getDisplayInfo
+  detectCategory
 };
