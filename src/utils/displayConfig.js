@@ -1,10 +1,12 @@
 // ========================================
 // displayConfig.js - 매칭 시스템 컨트롤 타워
-// v71 - 2026-01-18
+// v72 - 2026-01-19
 // ========================================
 // 
 // 모든 키 정규화, 별칭 매핑, 표시 정보를 한 곳에서 관리
 // API 응답 → 정규화 → 교육자료/UI 표시
+//
+// v72: 화가 풀네임 별칭 추가 (Sandro Botticelli → botticelli 등)
 //
 // ========================================
 
@@ -127,45 +129,63 @@ export const ALIASES = {
   'vangogh': 'vangogh',
   'van gogh': 'vangogh',
   'vincent van gogh': 'vangogh',
+  'vincentvangogh': 'vangogh',
   '반 고흐': 'vangogh',
+  '반고흐': 'vangogh',
   '빈센트 반 고흐': 'vangogh',
+  '빈센트반고흐': 'vangogh',
   'gogh': 'vangogh',
+  '고흐': 'vangogh',
+  'vincent': 'vangogh',
+  '빈센트': 'vangogh',
   
   // 클림트
   'klimt': 'klimt',
   'gustav klimt': 'klimt',
+  'gustavklimt': 'klimt',
   '클림트': 'klimt',
   '구스타프 클림트': 'klimt',
+  '구스타프클림트': 'klimt',
   
   // 뭉크
   'munch': 'munch',
   'edvard munch': 'munch',
+  'edvardmunch': 'munch',
   '뭉크': 'munch',
   '에드바르 뭉크': 'munch',
+  '에드바르뭉크': 'munch',
   
   // 마티스
   'matisse': 'matisse',
   'henri matisse': 'matisse',
+  'henrimatisse': 'matisse',
   '마티스': 'matisse',
   '앙리 마티스': 'matisse',
+  '앙리마티스': 'matisse',
   
   // 샤갈
   'chagall': 'chagall',
   'marc chagall': 'chagall',
+  'marcchagall': 'chagall',
   '샤갈': 'chagall',
   '마르크 샤갈': 'chagall',
+  '마르크샤갈': 'chagall',
   
   // 프리다
   'frida': 'frida',
   'frida kahlo': 'frida',
+  'fridakahlo': 'frida',
   '프리다': 'frida',
   '프리다 칼로': 'frida',
+  '프리다칼로': 'frida',
   
   // 리히텐슈타인
   'lichtenstein': 'lichtenstein',
   'roy lichtenstein': 'lichtenstein',
+  'roylichtenstein': 'lichtenstein',
   '리히텐슈타인': 'lichtenstein',
   '로이 리히텐슈타인': 'lichtenstein',
+  '로이리히텐슈타인': 'lichtenstein',
   
   // ===== 동양화 별칭 =====
   // 한국 - 민화
@@ -254,20 +274,30 @@ export const ALIASES = {
   // 르네상스
   'leonardo': 'leonardo',
   'leonardo da vinci': 'leonardo',
+  'leonardodavinci': 'leonardo',
+  'davinci': 'leonardo',
   '레오나르도': 'leonardo',
   '다빈치': 'leonardo',
+  '레오나르도다빈치': 'leonardo',
   
   'michelangelo': 'michelangelo',
+  'michelangelo buonarroti': 'michelangelo',
   '미켈란젤로': 'michelangelo',
   
   'raphael': 'raphael',
+  'raphael sanzio': 'raphael',
+  'raffaello sanzio': 'raphael',
   '라파엘로': 'raphael',
   '라파엘': 'raphael',
   
   'botticelli': 'botticelli',
+  'sandro botticelli': 'botticelli',
+  'sandrobotticelli': 'botticelli',
   '보티첼리': 'botticelli',
   
   'titian': 'titian',
+  'tiziano': 'titian',
+  'tiziano vecellio': 'titian',
   '티치아노': 'titian',
   
   // 바로크
@@ -275,91 +305,154 @@ export const ALIASES = {
   '카라바조': 'caravaggio',
   
   'rembrandt': 'rembrandt',
+  'rembrandt van rijn': 'rembrandt',
   '렘브란트': 'rembrandt',
   
   'velazquez': 'velazquez',
   'velázquez': 'velazquez',
+  'diego velazquez': 'velazquez',
+  'diego velázquez': 'velazquez',
+  'diegovelazquez': 'velazquez',
   '벨라스케스': 'velazquez',
   
   'rubens': 'rubens',
+  'peter paul rubens': 'rubens',
+  'peterpaulrubens': 'rubens',
   '루벤스': 'rubens',
   
   // 로코코
   'watteau': 'watteau',
+  'jean-antoine watteau': 'watteau',
+  'jeanantoinewatteau': 'watteau',
+  'antoinewatteau': 'watteau',
   '와토': 'watteau',
   
   'boucher': 'boucher',
   'françois boucher': 'boucher',
   'francois boucher': 'boucher',
+  'francoisboucher': 'boucher',
   '부셰': 'boucher',
   
   // 신고전·낭만·사실
   'david': 'david',
   'jacques-louis david': 'david',
+  'jacqueslouisdavid': 'david',
   '다비드': 'david',
   
   'ingres': 'ingres',
+  'jean-auguste-dominique ingres': 'ingres',
+  'jeanaugustdominiqueingres': 'ingres',
+  'jeanaugustedominiqueingres': 'ingres',
   '앵그르': 'ingres',
   
   'turner': 'turner',
+  'j.m.w. turner': 'turner',
+  'jmw turner': 'turner',
+  'jmwturner': 'turner',
+  'william turner': 'turner',
   '터너': 'turner',
   
   'delacroix': 'delacroix',
+  'eugene delacroix': 'delacroix',
+  'eugène delacroix': 'delacroix',
+  'eugenedelacroix': 'delacroix',
   '들라크루아': 'delacroix',
   
   'courbet': 'courbet',
+  'gustave courbet': 'courbet',
+  'gustavecourbet': 'courbet',
   '쿠르베': 'courbet',
   
   'manet': 'manet',
+  'edouard manet': 'manet',
+  'édouard manet': 'manet',
+  'edouardmanet': 'manet',
   '마네': 'manet',
   
   // 인상주의
   'monet': 'monet',
   'claude monet': 'monet',
+  'claudemonet': 'monet',
   '모네': 'monet',
+  '클로드모네': 'monet',
   
   'renoir': 'renoir',
+  'pierre-auguste renoir': 'renoir',
+  'pierreaugusterenoir': 'renoir',
   '르누아르': 'renoir',
+  '피에르오귀스트르누아르': 'renoir',
   
   'degas': 'degas',
+  'edgar degas': 'degas',
+  'edgardegas': 'degas',
   '드가': 'degas',
+  '에드가드가': 'degas',
   
   'caillebotte': 'caillebotte',
+  'gustave caillebotte': 'caillebotte',
+  'gustavecaillebotte': 'caillebotte',
   '카유보트': 'caillebotte',
+  '귀스타브카유보트': 'caillebotte',
   
   // 후기인상주의
   'gauguin': 'gauguin',
+  'paul gauguin': 'gauguin',
+  'paulgauguin': 'gauguin',
   '고갱': 'gauguin',
+  '폴고갱': 'gauguin',
   
   'cezanne': 'cezanne',
   'cézanne': 'cezanne',
+  'paul cezanne': 'cezanne',
+  'paul cézanne': 'cezanne',
+  'paulcezanne': 'cezanne',
   '세잔': 'cezanne',
+  '폴세잔': 'cezanne',
   
   // 야수파
   'derain': 'derain',
+  'andre derain': 'derain',
+  'andré derain': 'derain',
+  'andrederain': 'derain',
   '드랭': 'derain',
   
   'vlaminck': 'vlaminck',
+  'maurice de vlaminck': 'vlaminck',
+  'mauricedevlaminck': 'vlaminck',
   '블라맹크': 'vlaminck',
   
   // 표현주의
   'kirchner': 'kirchner',
+  'ernst ludwig kirchner': 'kirchner',
+  'ernstludwigkirchner': 'kirchner',
   '키르히너': 'kirchner',
   
   'kokoschka': 'kokoschka',
+  'oskar kokoschka': 'kokoschka',
+  'oskarkokoschka': 'kokoschka',
   '코코슈카': 'kokoschka',
   
   // 모더니즘
   'picasso': 'picasso',
   'pablo picasso': 'picasso',
+  'pablopicasso': 'picasso',
   '피카소': 'picasso',
+  '파블로피카소': 'picasso',
   
   'magritte': 'magritte',
+  'rene magritte': 'magritte',
+  'rené magritte': 'magritte',
+  'renemagritte': 'magritte',
   '마그리트': 'magritte',
+  '르네마그리트': 'magritte',
   
   'miro': 'miro',
   'miró': 'miro',
-  '미로': 'miro'
+  'joan miro': 'miro',
+  'joan miró': 'miro',
+  'joanmiro': 'miro',
+  '미로': 'miro',
+  '호안미로': 'miro'
 };
 
 // ========================================
@@ -371,15 +464,22 @@ export function normalizeKey(input) {
   // 소문자 변환 + 앞뒤 공백 제거
   const lower = input.toLowerCase().trim();
   
-  // 별칭 테이블에서 찾기
+  // 1차: 별칭 테이블에서 직접 찾기
   if (ALIASES[lower]) {
     return ALIASES[lower];
   }
   
-  // 언더스코어 → 하이픈 변환 후 다시 찾기
+  // 2차: 언더스코어 → 하이픈 변환 후 찾기
   const hyphenated = lower.replace(/_/g, '-');
   if (ALIASES[hyphenated]) {
     return ALIASES[hyphenated];
+  }
+  
+  // 3차: 공백/하이픈 모두 제거 후 찾기 (v65 호환)
+  // "Sandro Botticelli" → "sandrobotticelli" → "botticelli"
+  const collapsed = lower.replace(/[\s-]/g, '');
+  if (ALIASES[collapsed]) {
+    return ALIASES[collapsed];
   }
   
   // 그대로 반환 (표준 키일 수 있음)
