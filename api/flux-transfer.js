@@ -3787,21 +3787,82 @@ export default async function handler(req, res) {
     console.log(`   ${finalPrompt.substring(0, 500)}...`);
     console.log('');
     
-    // FLUX Depth Dev 변환 - 재시도 로직 포함
-    const MAX_RETRIES = 3;
-    let response;
+    // ========================================
+    // v77: 비동기 폴링 방식 (504 타임아웃 해결)
+    // - 'Prefer: wait' 제거 → 즉시 prediction ID 반환
+    // - 2초마다 상태 확인 → 완료될 때까지 대기
+    // - 최대 180초 (3분) 대기
+    // ========================================
+    
+    const POLL_INTERVAL = 2000;  // 2초마다 확인
+    const MAX_POLL_TIME = 180000;  // 최대 180초 (3분)
+    const MAX_RETRIES = 3;  // 생성 요청 재시도 횟수
+    
+    // 폴링 함수
+    async function pollForResult(predictionId) {
+      const pollStart = Date.now();
+      
+      while (Date.now() - pollStart < MAX_POLL_TIME) {
+        try {
+          const statusResponse = await fetch(
+            `https://api.replicate.com/v1/predictions/${predictionId}`,
+            {
+              headers: {
+                'Authorization': `Token ${process.env.REPLICATE_API_KEY}`,
+              }
+            }
+          );
+          
+          if (!statusResponse.ok) {
+            console.log(`⚠️ 상태 확인 실패: ${statusResponse.status}`);
+            await new Promise(r => setTimeout(r, POLL_INTERVAL));
+            continue;
+          }
+          
+          const prediction = await statusResponse.json();
+          
+          // 완료
+          if (prediction.status === 'succeeded') {
+            console.log(`✅ 폴링 완료 (${Math.round((Date.now() - pollStart) / 1000)}초)`);
+            return { success: true, data: prediction };
+          }
+          
+          // 실패
+          if (prediction.status === 'failed' || prediction.status === 'canceled') {
+            console.log(`❌ 변환 실패: ${prediction.error || prediction.status}`);
+            return { success: false, error: prediction.error || 'Processing failed' };
+          }
+          
+          // 진행 중 - 계속 폴링
+          // console.log(`⏳ 상태: ${prediction.status}...`);
+          await new Promise(r => setTimeout(r, POLL_INTERVAL));
+          
+        } catch (err) {
+          console.log(`⚠️ 폴링 에러: ${err.message}`);
+          await new Promise(r => setTimeout(r, POLL_INTERVAL));
+        }
+      }
+      
+      // 타임아웃
+      return { success: false, error: 'Polling timeout (180s)' };
+    }
+    
+    // 1. Prediction 생성 (재시도 포함)
+    let prediction;
     let lastError;
     
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        response = await fetch(
+        console.log(`🚀 FLUX 요청 시작 (시도 ${attempt}/${MAX_RETRIES})...`);
+        
+        const createResponse = await fetch(
           'https://api.replicate.com/v1/models/black-forest-labs/flux-depth-dev/predictions',
           {
             method: 'POST',
             headers: {
               'Authorization': `Token ${process.env.REPLICATE_API_KEY}`,
-              'Content-Type': 'application/json',
-              'Prefer': 'wait'
+              'Content-Type': 'application/json'
+              // 'Prefer': 'wait' 제거 → 비동기 모드
             },
             body: JSON.stringify({
               input: {
@@ -3817,37 +3878,57 @@ export default async function handler(req, res) {
           }
         );
         
-        // 502/503/504 에러 시 재시도
-        if (response.status === 502 || response.status === 503 || response.status === 504) {
-          console.log(`🔄 FLUX Depth 재시도 (${attempt}/${MAX_RETRIES})... ${response.status} 에러`);
+        // 생성 요청 실패 시 재시도
+        if (!createResponse.ok) {
+          const errorText = await createResponse.text();
+          console.log(`⚠️ 생성 요청 실패 (${createResponse.status}): ${errorText}`);
+          
           if (attempt < MAX_RETRIES) {
-            await new Promise(r => setTimeout(r, 3000 * attempt)); // 3초, 6초, 9초 대기
+            await new Promise(r => setTimeout(r, 3000 * attempt));
             continue;
           }
+          
+          return res.status(createResponse.status).json({
+            error: `FLUX API error: ${createResponse.status}`,
+            details: errorText
+          });
         }
         
-        // 성공 또는 다른 에러면 루프 탈출
+        prediction = await createResponse.json();
+        console.log(`📋 Prediction 생성됨: ${prediction.id}`);
         break;
+        
       } catch (err) {
         lastError = err;
-        console.log(`🔄 FLUX Depth 재시도 (${attempt}/${MAX_RETRIES})... 네트워크 에러`);
+        console.log(`⚠️ 네트워크 에러 (시도 ${attempt}/${MAX_RETRIES}): ${err.message}`);
+        
         if (attempt < MAX_RETRIES) {
-          await new Promise(r => setTimeout(r, 2000 * attempt));
+          await new Promise(r => setTimeout(r, 3000 * attempt));
           continue;
         }
       }
     }
-
-    if (!response || !response.ok) {
-      const errorText = await response.text();
-      console.error('FLUX Depth error:', response.status, errorText);
-      return res.status(response.status).json({ 
-        error: `FLUX API error: ${response.status}`,
-        details: errorText
+    
+    if (!prediction) {
+      return res.status(500).json({
+        error: 'Failed to create prediction',
+        details: lastError?.message
       });
     }
-
-    const data = await response.json();
+    
+    // 2. 폴링으로 결과 대기
+    console.log(`⏳ 결과 대기 중... (최대 ${MAX_POLL_TIME / 1000}초)`);
+    const pollResult = await pollForResult(prediction.id);
+    
+    if (!pollResult.success) {
+      console.error('FLUX 처리 실패:', pollResult.error);
+      return res.status(500).json({
+        error: 'FLUX processing failed',
+        details: pollResult.error
+      });
+    }
+    
+    const data = pollResult.data;
     
     // v66: 완료 로그
     const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
