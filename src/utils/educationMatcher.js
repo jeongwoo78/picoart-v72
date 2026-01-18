@@ -1,10 +1,12 @@
 // ========================================
 // educationMatcher.js - displayConfig 기반 교육자료 매칭
-// v71 - 2026-01-18
+// v72 - 2026-01-18
 // ========================================
 //
 // 모든 정규화는 displayConfig.js에서 처리
 // 이 파일은 교육자료 연결만 담당
+//
+// v72: getEducationKey 3개 인자 지원, getEducationContent 카테고리별 데이터 지원
 //
 // ========================================
 
@@ -19,24 +21,32 @@ import { normalizeKey, getArtistName, ALIASES } from './displayConfig.js';
  * @param {string} category - 'movements' | 'masters' | 'oriental'
  * @param {string} key - 정규화된 키 (monet, vangogh, korean-minhwa 등)
  * @param {object} educationData - 교육자료 데이터 객체
+ *   - 카테고리별 구조: { masters: {...}, movements: {...}, oriental: {...} }
+ *   - 또는 직접 데이터: { vangogh: {...}, klimt: {...} }
  */
 export function getEducationContent(category, key, educationData) {
   if (!educationData || !key) return null;
   
+  // 카테고리별 데이터 구조인지 확인 (ProcessingScreen, ResultScreen에서 사용하는 형태)
+  let targetData = educationData;
+  if (educationData[category] && typeof educationData[category] === 'object') {
+    targetData = educationData[category];
+  }
+  
   // 직접 매칭 시도
-  if (educationData[key]) {
+  if (targetData[key]) {
     console.log(`✅ getEducationContent: direct match for ${key}`);
-    return educationData[key].content || educationData[key].desc || null;
+    return targetData[key].content || targetData[key].desc || null;
   }
   
   // ALIASES를 통한 정규화 후 재시도
   const normalizedKey = normalizeKey(key);
-  if (normalizedKey !== key && educationData[normalizedKey]) {
+  if (normalizedKey !== key && targetData[normalizedKey]) {
     console.log(`✅ getEducationContent: alias match ${key} → ${normalizedKey}`);
-    return educationData[normalizedKey].content || educationData[normalizedKey].desc || null;
+    return targetData[normalizedKey].content || targetData[normalizedKey].desc || null;
   }
   
-  console.log(`❌ getEducationContent: no match found for key: ${key}`);
+  console.log(`❌ getEducationContent: no match found for key: ${key} in category: ${category}`);
   return null;
 }
 
@@ -72,10 +82,33 @@ export function getOrientalEducationKey(styleId) {
 /**
  * 통합 함수: 카테고리별 교육자료 키 가져오기
  * @param {string} category - 'movements' | 'masters' | 'oriental'
- * @param {object} apiResponse - API 응답 (aiSelectedArtist, selected_work 등)
+ * @param {object|string} apiResponseOrArtist - API 응답 객체 또는 화가명 문자열
+ * @param {string} [selectedWork] - 작품명 (문자열로 호출할 때만 사용)
+ * 
+ * 사용법 1 (객체): getEducationKey('masters', { aiSelectedArtist: 'vangogh', selected_work: 'The Starry Night' })
+ * 사용법 2 (문자열): getEducationKey('masters', 'vangogh', 'The Starry Night')
  */
-export function getEducationKey(category, apiResponse) {
-  const { aiSelectedArtist, selected_work, styleId, masterId } = apiResponse;
+export function getEducationKey(category, apiResponseOrArtist, selectedWork) {
+  let aiSelectedArtist, selected_work, styleId, masterId;
+  
+  // 문자열로 호출된 경우 (ProcessingScreen, ResultScreen에서 사용)
+  if (typeof apiResponseOrArtist === 'string') {
+    aiSelectedArtist = apiResponseOrArtist;
+    selected_work = selectedWork;
+    styleId = apiResponseOrArtist;
+    masterId = apiResponseOrArtist;
+  } 
+  // 객체로 호출된 경우
+  else if (apiResponseOrArtist && typeof apiResponseOrArtist === 'object') {
+    aiSelectedArtist = apiResponseOrArtist.aiSelectedArtist;
+    selected_work = apiResponseOrArtist.selected_work;
+    styleId = apiResponseOrArtist.styleId;
+    masterId = apiResponseOrArtist.masterId;
+  }
+  // null/undefined인 경우
+  else {
+    return null;
+  }
   
   switch (category) {
     case 'masters':
