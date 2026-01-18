@@ -109,12 +109,20 @@ const MASTER_DEFAULT_KEYS = {
 /**
  * 거장 교육자료 키 가져오기
  * @param {string} masterKey - 거장 키 (vangogh, klimt 등)
- * @param {string} selectedWork - AI가 선택한 작품명 (미사용, 하위호환용)
+ * @param {string} selectedWork - AI가 선택한 작품명
  */
 export function getMasterEducationKey(masterKey, selectedWork) {
-  // v72: 작품별 매칭 제거, 화가별 단순 키만 반환
+  // 작품명으로 매칭 시도
+  if (selectedWork) {
+    const workLower = selectedWork.toLowerCase().trim();
+    if (MASTERS_WORK_MAP[workLower]) {
+      return MASTERS_WORK_MAP[workLower];
+    }
+  }
+  
+  // 작품 매칭 실패시 기본 키
   const normalizedMaster = normalizeKey(masterKey);
-  return normalizedMaster;
+  return MASTER_DEFAULT_KEYS[normalizedMaster] || `${normalizedMaster}-default`;
 }
 
 /**
@@ -138,10 +146,25 @@ export function getOrientalEducationKey(styleId) {
 /**
  * 통합 함수: 카테고리별 교육자료 키 가져오기
  * @param {string} category - 'movements' | 'masters' | 'oriental'
- * @param {object} apiResponse - API 응답 (aiSelectedArtist, selected_work 등)
+ * @param {string|object} artistOrResponse - 화가명(string) 또는 API 응답 객체
+ * @param {string} [workName] - 작품명 (artistOrResponse가 string일 때 사용)
  */
-export function getEducationKey(category, apiResponse) {
-  const { aiSelectedArtist, selected_work, styleId, masterId } = apiResponse;
+export function getEducationKey(category, artistOrResponse, workName) {
+  // v72: 유연한 인자 처리 - string 또는 object 모두 지원
+  let aiSelectedArtist, selected_work, styleId, masterId;
+  
+  if (typeof artistOrResponse === 'string') {
+    // string으로 직접 전달된 경우 (ResultScreen 호환)
+    aiSelectedArtist = artistOrResponse;
+    selected_work = workName;
+    styleId = artistOrResponse;
+    masterId = artistOrResponse;
+  } else if (artistOrResponse && typeof artistOrResponse === 'object') {
+    // object로 전달된 경우 (기존 방식)
+    ({ aiSelectedArtist, selected_work, styleId, masterId } = artistOrResponse);
+  } else {
+    return '';
+  }
   
   switch (category) {
     case 'masters':
@@ -156,6 +179,49 @@ export function getEducationKey(category, apiResponse) {
     default:
       return normalizeKey(aiSelectedArtist || styleId || '');
   }
+}
+
+/**
+ * 교육자료 콘텐츠 가져오기
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} key - 정규화된 교육자료 키
+ * @param {object} educationData - 카테고리별 교육자료 객체
+ * @returns {string|null} - 교육자료 콘텐츠 또는 null
+ */
+export function getEducationContent(category, key, educationData) {
+  if (!key || !educationData) {
+    console.log('❌ getEducationContent: missing key or educationData', { key, hasData: !!educationData });
+    return null;
+  }
+  
+  const categoryData = educationData[category];
+  if (!categoryData) {
+    console.log('❌ getEducationContent: no data for category', category);
+    return null;
+  }
+  
+  // 직접 매칭 시도
+  if (categoryData[key]) {
+    console.log('✅ getEducationContent: direct match for', key);
+    return categoryData[key].content || categoryData[key].desc || null;
+  }
+  
+  // 소문자 변환 후 매칭
+  const lowerKey = key.toLowerCase();
+  if (categoryData[lowerKey]) {
+    console.log('✅ getEducationContent: lowercase match for', lowerKey);
+    return categoryData[lowerKey].content || categoryData[lowerKey].desc || null;
+  }
+  
+  // 하이픈/언더스코어 변환 후 매칭
+  const hyphenKey = lowerKey.replace(/_/g, '-');
+  if (categoryData[hyphenKey]) {
+    console.log('✅ getEducationContent: hyphen match for', hyphenKey);
+    return categoryData[hyphenKey].content || categoryData[hyphenKey].desc || null;
+  }
+  
+  console.log('❌ getEducationContent: no match found for key:', key);
+  return null;
 }
 
 /**
@@ -185,6 +251,7 @@ export default {
   getMovementEducationKey,
   getOrientalEducationKey,
   getEducationKey,
+  getEducationContent,
   getArtistDisplayInfo,
   normalizeArtistKey,
   normalizeOrientalKey,
