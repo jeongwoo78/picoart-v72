@@ -15,6 +15,32 @@ import { normalizeKey, getArtistName, ALIASES } from './displayConfig.js';
 // ========================================
 
 /**
+ * 교육자료 콘텐츠 가져오기
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} key - 정규화된 키 (monet, vangogh, korean-minhwa 등)
+ * @param {object} educationData - 교육자료 데이터 객체
+ */
+export function getEducationContent(category, key, educationData) {
+  if (!educationData || !key) return null;
+  
+  // 직접 매칭 시도
+  if (educationData[key]) {
+    console.log(`✅ getEducationContent: direct match for ${key}`);
+    return educationData[key].content || educationData[key].desc || null;
+  }
+  
+  // ALIASES를 통한 정규화 후 재시도
+  const normalizedKey = normalizeKey(key);
+  if (normalizedKey !== key && educationData[normalizedKey]) {
+    console.log(`✅ getEducationContent: alias match ${key} → ${normalizedKey}`);
+    return educationData[normalizedKey].content || educationData[normalizedKey].desc || null;
+  }
+  
+  console.log(`❌ getEducationContent: no match found for key: ${key}`);
+  return null;
+}
+
+/**
  * 거장 교육자료 키 가져오기
  * @param {string} masterKey - 거장 키 (vangogh, klimt 등)
  * @param {string} selectedWork - AI가 선택한 작품명
@@ -89,13 +115,12 @@ export function normalizeOrientalKey(styleId) {
 }
 
 export default {
+  getEducationContent,
   getMasterEducationKey,
   getMovementEducationKey,
   getOrientalEducationKey,
   getEducationKey,
   getArtistDisplayInfo,
   normalizeArtistKey,
-  normalizeOrientalKey,
-  MASTERS_WORK_MAP,
-  MASTER_DEFAULT_KEYS
+  normalizeOrientalKey
 };
