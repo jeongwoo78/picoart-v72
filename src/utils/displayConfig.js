@@ -174,6 +174,8 @@ export const ALIASES = {
   'korean minhwa': 'korean-minhwa',
   'minhwa': 'korean-minhwa',
   '민화': 'korean-minhwa',
+  '한국 민화': 'korean-minhwa',
+  '한국민화': 'korean-minhwa',
   
   // 한국 - 풍속도
   'korean-pungsokdo': 'korean-pungsokdo',
@@ -181,9 +183,10 @@ export const ALIASES = {
   'korean pungsokdo': 'korean-pungsokdo',
   'korean-genre': 'korean-pungsokdo',
   'korean_genre': 'korean-pungsokdo',
-  'korean genre': 'korean-pungsokdo',
   'pungsokdo': 'korean-pungsokdo',
   '풍속도': 'korean-pungsokdo',
+  '한국 풍속도': 'korean-pungsokdo',
+  '한국풍속도': 'korean-pungsokdo',
   
   // 한국 - 진경산수
   'korean-jingyeong': 'korean-jingyeong',
@@ -192,6 +195,8 @@ export const ALIASES = {
   'jingyeong': 'korean-jingyeong',
   '진경산수': 'korean-jingyeong',
   '진경산수화': 'korean-jingyeong',
+  '한국 진경산수': 'korean-jingyeong',
+  '한국진경산수': 'korean-jingyeong',
   
   // 중국 - 수묵화
   'chinese-ink': 'chinese-ink',
@@ -199,6 +204,8 @@ export const ALIASES = {
   'chinese ink': 'chinese-ink',
   'shuimohua': 'chinese-ink',
   '수묵화': 'chinese-ink',
+  '중국 수묵화': 'chinese-ink',
+  '중국수묵화': 'chinese-ink',
   
   // 중국 - 공필화
   'chinese-gongbi': 'chinese-gongbi',
@@ -206,23 +213,25 @@ export const ALIASES = {
   'chinese gongbi': 'chinese-gongbi',
   'gongbi': 'chinese-gongbi',
   '공필화': 'chinese-gongbi',
+  '중국 공필화': 'chinese-gongbi',
+  '중국공필화': 'chinese-gongbi',
   
   // 일본 - 우키요에
   'japanese-ukiyoe': 'japanese-ukiyoe',
   'japanese_ukiyoe': 'japanese-ukiyoe',
   'japanese ukiyoe': 'japanese-ukiyoe',
   'japanese ukiyo-e': 'japanese-ukiyoe',
-  'japanese-ukiyo-e': 'japanese-ukiyoe',
   'ukiyoe': 'japanese-ukiyoe',
   'ukiyo-e': 'japanese-ukiyoe',
   '우키요에': 'japanese-ukiyoe',
+  '일본 우키요에': 'japanese-ukiyoe',
+  '일본우키요에': 'japanese-ukiyoe',
   
   // ===== 화가 별칭 (37명) =====
   // 그리스·로마
   'classical sculpture': 'classical-sculpture',
   'classical-sculpture': 'classical-sculpture',
   'ancient-greek-sculpture': 'classical-sculpture',
-  'ancient greek sculpture': 'classical-sculpture',
   '고대 그리스 조각': 'classical-sculpture',
   
   'roman mosaic': 'roman-mosaic',
@@ -231,13 +240,10 @@ export const ALIASES = {
   
   // 중세
   'byzantine': 'byzantine',
-  'byzantine art': 'byzantine',
   '비잔틴': 'byzantine',
   '비잔틴 미술': 'byzantine',
   
   'gothic': 'gothic',
-  'gothic art': 'gothic',
-  'gothic stained glass': 'gothic',
   '고딕': 'gothic',
   '고딕 미술': 'gothic',
   
@@ -250,178 +256,110 @@ export const ALIASES = {
   'leonardo da vinci': 'leonardo',
   '레오나르도': 'leonardo',
   '다빈치': 'leonardo',
-  '레오나르도 다 빈치': 'leonardo',
   
   'michelangelo': 'michelangelo',
-  'michelangelo buonarroti': 'michelangelo',
   '미켈란젤로': 'michelangelo',
-  '미켈란젤로 부오나로티': 'michelangelo',
   
   'raphael': 'raphael',
-  'raffaello sanzio': 'raphael',
-  'raphael sanzio': 'raphael',
   '라파엘로': 'raphael',
   '라파엘': 'raphael',
-  '라파엘로 산치오': 'raphael',
   
   'botticelli': 'botticelli',
-  'sandro botticelli': 'botticelli',
   '보티첼리': 'botticelli',
-  '산드로 보티첼리': 'botticelli',
   
   'titian': 'titian',
-  'tiziano vecellio': 'titian',
   '티치아노': 'titian',
-  '티치아노 베첼리오': 'titian',
   
   // 바로크
   'caravaggio': 'caravaggio',
-  'michelangelo merisi da caravaggio': 'caravaggio',
   '카라바조': 'caravaggio',
-  '미켈란젤로 메리시 다 카라바조': 'caravaggio',
   
   'rembrandt': 'rembrandt',
-  'rembrandt van rijn': 'rembrandt',
   '렘브란트': 'rembrandt',
-  '렘브란트 판 레인': 'rembrandt',
   
   'velazquez': 'velazquez',
   'velázquez': 'velazquez',
-  'diego velazquez': 'velazquez',
-  'diego velázquez': 'velazquez',
   '벨라스케스': 'velazquez',
-  '디에고 벨라스케스': 'velazquez',
   
   'rubens': 'rubens',
-  'peter paul rubens': 'rubens',
   '루벤스': 'rubens',
-  '페테르 파울 루벤스': 'rubens',
   
   // 로코코
   'watteau': 'watteau',
-  'jean-antoine watteau': 'watteau',
-  'jean antoine watteau': 'watteau',
   '와토': 'watteau',
-  '장 앙투안 와토': 'watteau',
   
   'boucher': 'boucher',
   'françois boucher': 'boucher',
   'francois boucher': 'boucher',
   '부셰': 'boucher',
-  '프랑수아 부셰': 'boucher',
   
   // 신고전·낭만·사실
   'david': 'david',
   'jacques-louis david': 'david',
-  'jacques louis david': 'david',
   '다비드': 'david',
-  '자크 루이 다비드': 'david',
   
   'ingres': 'ingres',
-  'jean-auguste-dominique ingres': 'ingres',
-  'jean auguste dominique ingres': 'ingres',
   '앵그르': 'ingres',
-  '장 오귀스트 도미니크 앵그르': 'ingres',
   
   'turner': 'turner',
-  'j.m.w. turner': 'turner',
-  'joseph mallord william turner': 'turner',
   '터너': 'turner',
-  '조지프 말로드 윌리엄 터너': 'turner',
   
   'delacroix': 'delacroix',
-  'eugène delacroix': 'delacroix',
-  'eugene delacroix': 'delacroix',
   '들라크루아': 'delacroix',
-  '외젠 들라크루아': 'delacroix',
   
   'courbet': 'courbet',
-  'gustave courbet': 'courbet',
   '쿠르베': 'courbet',
-  '귀스타브 쿠르베': 'courbet',
   
   'manet': 'manet',
-  'édouard manet': 'manet',
-  'edouard manet': 'manet',
   '마네': 'manet',
-  '에두아르 마네': 'manet',
   
   // 인상주의
   'monet': 'monet',
   'claude monet': 'monet',
   '모네': 'monet',
-  '클로드 모네': 'monet',
   
   'renoir': 'renoir',
-  'pierre-auguste renoir': 'renoir',
-  'pierre auguste renoir': 'renoir',
   '르누아르': 'renoir',
-  '피에르 오귀스트 르누아르': 'renoir',
   
   'degas': 'degas',
-  'edgar degas': 'degas',
   '드가': 'degas',
-  '에드가 드가': 'degas',
   
   'caillebotte': 'caillebotte',
-  'gustave caillebotte': 'caillebotte',
   '카유보트': 'caillebotte',
-  '귀스타브 카유보트': 'caillebotte',
   
   // 후기인상주의
   'gauguin': 'gauguin',
-  'paul gauguin': 'gauguin',
   '고갱': 'gauguin',
-  '폴 고갱': 'gauguin',
   
   'cezanne': 'cezanne',
   'cézanne': 'cezanne',
-  'paul cezanne': 'cezanne',
-  'paul cézanne': 'cezanne',
   '세잔': 'cezanne',
-  '폴 세잔': 'cezanne',
   
   // 야수파
   'derain': 'derain',
-  'andré derain': 'derain',
-  'andre derain': 'derain',
   '드랭': 'derain',
-  '앙드레 드랭': 'derain',
   
   'vlaminck': 'vlaminck',
-  'maurice de vlaminck': 'vlaminck',
   '블라맹크': 'vlaminck',
-  '모리스 드 블라맹크': 'vlaminck',
   
   // 표현주의
   'kirchner': 'kirchner',
-  'ernst ludwig kirchner': 'kirchner',
   '키르히너': 'kirchner',
-  '에른스트 루트비히 키르히너': 'kirchner',
   
   'kokoschka': 'kokoschka',
-  'oskar kokoschka': 'kokoschka',
   '코코슈카': 'kokoschka',
-  '오스카 코코슈카': 'kokoschka',
   
   // 모더니즘
   'picasso': 'picasso',
   'pablo picasso': 'picasso',
   '피카소': 'picasso',
-  '파블로 피카소': 'picasso',
   
   'magritte': 'magritte',
-  'rené magritte': 'magritte',
-  'rene magritte': 'magritte',
   '마그리트': 'magritte',
-  '르네 마그리트': 'magritte',
   
   'miro': 'miro',
   'miró': 'miro',
-  'joan miro': 'miro',
-  'joan miró': 'miro',
-  '미로': 'miro',
-  '호안 미로': 'miro'
+  '미로': 'miro'
 };
 
 // ========================================
