@@ -693,7 +693,9 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                   ? getMasterInfo(selectedStyle?.name).fullName 
                   : selectedStyle?.category === 'movements'
                     ? getMovementDisplayInfo(selectedStyle?.name, null).title
-                    : (selectedStyle?.name || '스타일 변환')}
+                    : selectedStyle?.category === 'oriental'
+                      ? getOrientalDisplayInfo(selectedStyle?.id).title
+                      : (selectedStyle?.name || '스타일 변환')}
               </div>
             </div>
             {getSingleEducationContent(selectedStyle) && (
