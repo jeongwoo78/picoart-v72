@@ -1829,7 +1829,7 @@ const fallbackPrompts = {
   
   japanese: {
     name: '일본 우키요에',
-    prompt: 'Japanese Ukiyo-e woodblock print, Ukiyo-e art style, flat areas of bold solid colors, strong clear black outlines, completely flat two-dimensional composition, CLOTHING: MUST transform to traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, stylized simplified forms, elegant refined Japanese aesthetic, authentic Japanese ukiyo-e masterpiece quality, CRITICAL ANTI-HALLUCINATION preserve EXACT number of people from original photo, if 1 person then ONLY 1 person in result, simple scenic background ONLY Mt Fuji or cherry blossom or waves or sky, VISIBLE WOODBLOCK PRINT TEXTURE 20mm+'
+    prompt: 'Japanese Ukiyo-e woodblock print, Ukiyo-e art style, flat areas of bold solid colors, strong clear black outlines, completely flat two-dimensional composition, CLOTHING: MUST transform to traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, stylized simplified forms, elegant refined Japanese aesthetic, authentic Japanese ukiyo-e masterpiece quality, CRITICAL ANTI-HALLUCINATION preserve EXACT number of people from original photo, if 1 person then ONLY 1 person in result, CRITICAL ANIMAL PRESERVATION if photo has animals (dogs cats birds) MUST include them drawn in ukiyo-e style with bold outlines, simple scenic background ONLY Mt Fuji or cherry blossom or waves or sky, VISIBLE WOODBLOCK PRINT TEXTURE 20mm+'
   },
   
   masters: {
