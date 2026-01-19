@@ -789,10 +789,18 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
         )}
 
         {/* ===== 단일 변환 모드 ===== */}
-        {!isFullTransform && showEducation && getSingleEducationContent(selectedStyle) && (
-          <div className="edu-card primary">
-            <h3>{getSingleEducationContent(selectedStyle).title}</h3>
-            <p>{getSingleEducationContent(selectedStyle).desc}</p>
+        {!isFullTransform && showEducation && (
+          <div className="preview">
+            <img src={URL.createObjectURL(photo)} alt="원본 사진" />
+            <div className="preview-info">
+              <div className="preview-style">{selectedStyle?.name || '스타일 변환'}</div>
+            </div>
+            {getSingleEducationContent(selectedStyle) && (
+              <div className="edu-card primary">
+                <h3>{getSingleEducationContent(selectedStyle).title}</h3>
+                <p>{getSingleEducationContent(selectedStyle).desc}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
