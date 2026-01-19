@@ -1992,9 +1992,17 @@ const ResultScreen = ({
         </div>
 
         {/* 원클릭: viewIndex에 따라 원본/결과 표시 */}
-        {isFullTransform && viewIndex === -1 && (
-          <div className="result-image-wrapper">
-            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+        {/* v72: 원본 화면 - ProcessingScreen 카드형 레이아웃 */}
+        {isFullTransform && viewIndex === -1 && getPrimaryEducation() && (
+          <div className="preview-card">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
+            <div className="preview-info">
+              <div className="preview-style">{selectedStyle?.name || '전체 변환'}</div>
+            </div>
+            <div className="edu-card primary">
+              <h3>{getPrimaryEducation().title}</h3>
+              <p>{getPrimaryEducation().content}</p>
+            </div>
           </div>
         )}
         {isFullTransform && viewIndex >= 0 && (
@@ -2004,9 +2012,17 @@ const ResultScreen = ({
         )}
 
         {/* 단일 변환: viewIndex에 따라 원본/결과 표시 */}
-        {!isFullTransform && viewIndex === -1 && (
-          <div className="result-image-wrapper">
-            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+        {/* v72: 원본 화면 - ProcessingScreen 카드형 레이아웃 */}
+        {!isFullTransform && viewIndex === -1 && getPrimaryEducation() && (
+          <div className="preview-card">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
+            <div className="preview-info">
+              <div className="preview-style">{selectedStyle?.name}</div>
+            </div>
+            <div className="edu-card primary">
+              <h3>{getPrimaryEducation().title}</h3>
+              <p>{getPrimaryEducation().content || getPrimaryEducation().desc}</p>
+            </div>
           </div>
         )}
         {!isFullTransform && viewIndex >= 0 && finalDisplayImage && (
@@ -2039,30 +2055,15 @@ const ResultScreen = ({
           </div>
         )}
 
-        {/* Toggle Button */}
-        <div className="info-toggle">
-          <button 
-            className="toggle-button"
-            onClick={() => setShowInfo(!showInfo)}
-          >
-            {showInfo ? '🔽 작품 설명 숨기기' : '🔼 작품 설명 보기'}
-          </button>
-        </div>
-
-        {/* v72: 원본 화면 - 1차 교육자료 */}
-        {viewIndex === -1 && showInfo && getPrimaryEducation() && (
-          <div className="technique-card primary-edu">
-            <div className="card-header">
-              <div className="technique-icon">{selectedStyle.icon || '🎨'}</div>
-              <div>
-                <h2>{getPrimaryEducation().title}</h2>
-              </div>
-            </div>
-            <div className="card-body">
-              <p className="education-text" style={{ whiteSpace: 'pre-line' }}>
-                {getPrimaryEducation().content || getPrimaryEducation().desc}
-              </p>
-            </div>
+        {/* Toggle Button - 결과 화면에서만 표시 */}
+        {viewIndex >= 0 && (
+          <div className="info-toggle">
+            <button 
+              className="toggle-button"
+              onClick={() => setShowInfo(!showInfo)}
+            >
+              {showInfo ? '🔽 작품 설명 숨기기' : '🔼 작품 설명 보기'}
+            </button>
           </div>
         )}
 
@@ -2771,6 +2772,52 @@ const ResultScreen = ({
         .result-image {
           width: 100%;
           display: block;
+        }
+
+        /* v72: 원본 화면 - ProcessingScreen 카드형 레이아웃 */
+        .preview-card {
+          background: #f8f9fa;
+          border-radius: 12px;
+          overflow: hidden;
+          margin: 16px 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .preview-card .preview-image {
+          width: 100%;
+          display: block;
+        }
+        .preview-card .preview-info {
+          padding: 16px;
+          text-align: left;
+          border-bottom: 2px solid #e0e0e0;
+        }
+        .preview-card .preview-style {
+          font-size: 1.35rem;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 6px;
+          line-height: 1.3;
+        }
+        .preview-card .edu-card {
+          padding: 16px;
+          border-radius: 0;
+          margin: 0;
+        }
+        .preview-card .edu-card.primary {
+          background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+          border-left: 3px solid #667eea;
+        }
+        .preview-card .edu-card h3 {
+          color: #667eea;
+          margin: 0 0 10px;
+          font-size: 15px;
+        }
+        .preview-card .edu-card p {
+          color: #333;
+          line-height: 1.6;
+          font-size: 13px;
+          margin: 0;
+          white-space: pre-line;
         }
       `}</style>
     </div>
