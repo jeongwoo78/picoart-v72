@@ -1,4 +1,5 @@
-// PicoArt v71 - ResultScreen (displayConfig 기반)
+// PicoArt v72 - ResultScreen (스와이프 네비게이션)
+// v72: 원본+1차교육 ↔ 결과+2차교육 스와이프
 // v71: displayConfig.js 컨트롤 타워 사용
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,9 +10,9 @@ import { movementsOverview, movementsEducation, movementsBasicInfo, artistFullNa
 import { mastersBasicInfo, mastersLoadingEducation, mastersResultEducation, mastersEducation } from '../data/mastersEducation';
 import { orientalBasicInfo, orientalOverview, orientalEducation } from '../data/orientalEducation';
 // 원클릭 전용 교육자료 (분리된 파일)
-import { oneclickMovementsSecondary } from '../data/oneclickMovementsEducation';
-import { oneclickMastersSecondary } from '../data/oneclickMastersEducation';
-import { oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
+import { oneclickMovementsPrimary, oneclickMovementsSecondary } from '../data/oneclickMovementsEducation';
+import { oneclickMastersPrimary, oneclickMastersSecondary } from '../data/oneclickMastersEducation';
+import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
 import { saveToGallery } from './GalleryScreen';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 // v71: displayConfig 컨트롤 타워
@@ -53,6 +54,22 @@ const ResultScreen = ({
   // ========== 스와이프 ==========
   const [touchStartX, setTouchStartX] = useState(0);
   const [touchStartY, setTouchStartY] = useState(0);
+  
+  // v72: viewIndex - 원본/결과 스와이프용 (-1: 원본, 0~n: 결과)
+  const [viewIndex, setViewIndex] = useState(0);  // 기본값: 첫 번째 결과
+  
+  // v72: 1차 교육자료 (원본 화면용)
+  const getPrimaryEducation = () => {
+    const category = selectedStyle?.category;
+    if (category === 'movements') {
+      return { ...oneclickMovementsPrimary, title: '2,500년 서양미술사 관통' };
+    } else if (category === 'masters') {
+      return oneclickMastersPrimary;
+    } else if (category === 'oriental') {
+      return oneclickOrientalPrimary;
+    }
+    return null;
+  };
   
   // ========== 재시도 관련 ==========
   const [results, setResults] = useState(fullTransformResults || []);
@@ -1725,8 +1742,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean Minhwa (민화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['korean-minhwa']?.description 
-            || orientalEducation.korean_default?.description;
+        return orientalEducation.korean_minhwa?.description 
+            || orientalEducation.korean?.description;
       } 
       
       // 풍속화
@@ -1734,8 +1751,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean Genre Painting (풍속화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['korean-pungsokdo']?.description 
-            || orientalEducation.korean_default?.description;
+        return orientalEducation.korean_genre?.description 
+            || orientalEducation.korean?.description;
       } 
       
       // 진경산수화
@@ -1743,7 +1760,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean True-View Landscape (진경산수화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['korean-jingyeong']?.description 
+        return orientalEducation.korean_jingyeong?.description 
             || orientalEducation.korean_default?.description;
       }
       
@@ -1769,8 +1786,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Gongbi (工筆畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['chinese-gongbi']?.description 
-            || orientalEducation.chinese_default?.description;
+        return orientalEducation.chinese_gongbi?.description 
+            || orientalEducation.chinese_ink?.description;
       } 
       
       // 화조화
@@ -1778,7 +1795,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Huaniao (花鳥畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['chinese-huaniao']?.description 
+        return orientalEducation.chinese_huaniao?.description 
             || orientalEducation.chinese_default?.description;
       }
       
@@ -1787,7 +1804,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Ink Wash (水墨畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation['chinese-ink']?.description 
+        return orientalEducation.chinese_ink?.description 
             || orientalEducation.chinese_default?.description;
       }
       
@@ -1807,7 +1824,7 @@ const ResultScreen = ({
       // console.log('✅ MATCH: Japanese Ukiyo-e (浮世繪)');
       // console.log('========================================');
       // console.log('');
-      return orientalEducation['japanese-ukiyoe']?.description 
+      return orientalEducation.japanese_ukiyoe?.description 
           || orientalEducation.japanese_default?.description;
     }
     
@@ -1899,25 +1916,35 @@ const ResultScreen = ({
   };
 
 
-  // ========== 스와이프 핸들러 (원클릭) ==========
+  // ========== v72: 스와이프 핸들러 (viewIndex 기반) ==========
+  const totalResults = isFullTransform ? results.length : 1;
+  
   const handleTouchStart = (e) => {
-    if (!isFullTransform) return;
     setTouchStartX(e.touches[0].clientX);
     setTouchStartY(e.touches[0].clientY);
   };
 
   const handleTouchEnd = (e) => {
-    if (!isFullTransform || !touchStartX) return;
+    if (!touchStartX) return;
     const diffX = touchStartX - e.changedTouches[0].clientX;
     const diffY = touchStartY - e.changedTouches[0].clientY;
     
-    // 수평 스와이프만 인식 (X축 이동이 Y축보다 커야 함)
+    // 수평 스와이프만 인식
     if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
-      if (diffX > 0 && currentIndex < results.length - 1) {
-        setCurrentIndex(i => i + 1);  // 왼쪽 스와이프 → 다음
-      }
-      if (diffX < 0 && currentIndex > 0) {
-        setCurrentIndex(i => i - 1);  // 오른쪽 스와이프 → 이전
+      if (diffX > 0) {
+        // 왼쪽 스와이프 → 다음
+        if (viewIndex < totalResults - 1) {
+          const newIndex = viewIndex + 1;
+          setViewIndex(newIndex);
+          if (isFullTransform && newIndex >= 0) setCurrentIndex(newIndex);
+        }
+      } else {
+        // 오른쪽 스와이프 → 이전
+        if (viewIndex > -1) {
+          const newIndex = viewIndex - 1;
+          setViewIndex(newIndex);
+          if (isFullTransform && newIndex >= 0) setCurrentIndex(newIndex);
+        }
       }
     }
     setTouchStartX(0);
@@ -1945,20 +1972,27 @@ const ResultScreen = ({
           </p>
         </div>
 
-        {/* 원클릭: 이미지만 표시 (재변환 결과 반영) */}
-        {isFullTransform && (
+        {/* 원클릭: viewIndex에 따라 원본/결과 표시 */}
+        {isFullTransform && viewIndex === -1 && (
+          <div className="result-image-wrapper">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+          </div>
+        )}
+        {isFullTransform && viewIndex >= 0 && (
           <div className="result-image-wrapper">
             <img src={currentMasterResultImage || displayImage} alt="변환 결과" className="result-image" />
           </div>
         )}
 
-        {/* 단일 변환: Before/After Slider (v68: 재변환 결과 반영) */}
-        {!isFullTransform && finalDisplayImage && (
-          <div className="comparison-wrapper">
-            <BeforeAfter 
-              beforeImage={URL.createObjectURL(originalPhoto)}
-              afterImage={finalDisplayImage}
-            />
+        {/* 단일 변환: viewIndex에 따라 원본/결과 표시 */}
+        {!isFullTransform && viewIndex === -1 && (
+          <div className="result-image-wrapper">
+            <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="result-image" />
+          </div>
+        )}
+        {!isFullTransform && viewIndex >= 0 && finalDisplayImage && (
+          <div className="result-image-wrapper">
+            <img src={finalDisplayImage} alt="변환 결과" className="result-image" />
           </div>
         )}
 
@@ -1996,8 +2030,25 @@ const ResultScreen = ({
           </button>
         </div>
 
-        {/* Education Card */}
-        {showInfo && (
+        {/* v72: 원본 화면 - 1차 교육자료 */}
+        {viewIndex === -1 && showInfo && getPrimaryEducation() && (
+          <div className="technique-card primary-edu">
+            <div className="card-header">
+              <div className="technique-icon">{selectedStyle.icon || '🎨'}</div>
+              <div>
+                <h2>{getPrimaryEducation().title}</h2>
+              </div>
+            </div>
+            <div className="card-body">
+              <p className="education-text" style={{ whiteSpace: 'pre-line' }}>
+                {getPrimaryEducation().content || getPrimaryEducation().desc}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* v72: 결과 화면 - 2차 교육자료 (기존) */}
+        {viewIndex >= 0 && showInfo && (
           <div className="technique-card">
             
             {/* Card Header */}
@@ -2101,29 +2152,91 @@ const ResultScreen = ({
         {isFullTransform && (
           <div className="fullTransform-nav">
             <button 
-              onClick={() => setCurrentIndex(i => Math.max(0, i - 1))}
-              disabled={currentIndex === 0 || isRetrying}
+              onClick={() => {
+                if (viewIndex === -1) return;  // 원본이면 더 이전 없음
+                if (viewIndex === 0) {
+                  setViewIndex(-1);  // 첫 결과 → 원본
+                } else {
+                  setViewIndex(v => v - 1);
+                  setCurrentIndex(i => i - 1);
+                }
+              }}
+              disabled={viewIndex === -1 || isRetrying}
               className="nav-btn"
               style={{ opacity: isRetrying ? 0.5 : 1 }}
             >
               ◀ 이전
             </button>
             <div className="nav-dots">
+              {/* 📚 원본 도트 */}
+              <button
+                className={`nav-dot edu ${viewIndex === -1 ? 'active' : ''}`}
+                onClick={() => !isRetrying && setViewIndex(-1)}
+                disabled={isRetrying}
+                style={{ opacity: isRetrying ? 0.5 : 1 }}
+              >
+                📚
+              </button>
+              {/* 결과 도트들 */}
               {fullTransformResults.map((_, idx) => (
                 <button
                   key={idx}
-                  className={`nav-dot ${idx === currentIndex ? 'active' : ''}`}
-                  onClick={() => !isRetrying && setCurrentIndex(idx)}
+                  className={`nav-dot ${viewIndex === idx ? 'active' : ''}`}
+                  onClick={() => {
+                    if (!isRetrying) {
+                      setViewIndex(idx);
+                      setCurrentIndex(idx);
+                    }
+                  }}
                   disabled={isRetrying}
                   style={{ opacity: isRetrying ? 0.5 : 1 }}
                 />
               ))}
             </div>
             <button 
-              onClick={() => setCurrentIndex(i => Math.min(fullTransformResults.length - 1, i + 1))}
-              disabled={currentIndex === fullTransformResults.length - 1 || isRetrying}
+              onClick={() => {
+                if (viewIndex === -1) {
+                  setViewIndex(0);  // 원본 → 첫 결과
+                } else if (viewIndex < fullTransformResults.length - 1) {
+                  setViewIndex(v => v + 1);
+                  setCurrentIndex(i => i + 1);
+                }
+              }}
+              disabled={viewIndex === fullTransformResults.length - 1 || isRetrying}
               className="nav-btn"
               style={{ opacity: isRetrying ? 0.5 : 1 }}
+            >
+              다음 ▶
+            </button>
+          </div>
+        )}
+
+        {/* 단독 변환 네비게이션 */}
+        {!isFullTransform && (
+          <div className="fullTransform-nav">
+            <button 
+              onClick={() => setViewIndex(-1)}
+              disabled={viewIndex === -1}
+              className="nav-btn"
+            >
+              ◀ 이전
+            </button>
+            <div className="nav-dots">
+              <button
+                className={`nav-dot edu ${viewIndex === -1 ? 'active' : ''}`}
+                onClick={() => setViewIndex(-1)}
+              >
+                📚
+              </button>
+              <button
+                className={`nav-dot ${viewIndex === 0 ? 'active' : ''}`}
+                onClick={() => setViewIndex(0)}
+              />
+            </div>
+            <button 
+              onClick={() => setViewIndex(0)}
+              disabled={viewIndex === 0}
+              className="nav-btn"
             >
               다음 ▶
             </button>
@@ -2632,6 +2745,17 @@ const ResultScreen = ({
         .nav-dot.active {
           background: #667eea;
           transform: scale(1.3);
+        }
+        .nav-dot.edu {
+          width: auto;
+          height: auto;
+          padding: 2px 6px;
+          font-size: 14px;
+          border-radius: 8px;
+          background: #f0f0f0;
+        }
+        .nav-dot.edu.active {
+          background: #667eea;
         }
         
         /* 원클릭 이미지 */
