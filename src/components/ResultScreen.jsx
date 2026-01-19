@@ -1725,8 +1725,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean Minhwa (민화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.korean_minhwa?.description 
-            || orientalEducation.korean?.description;
+        return orientalEducation['korean-minhwa']?.description 
+            || orientalEducation.korean_default?.description;
       } 
       
       // 풍속화
@@ -1734,8 +1734,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean Genre Painting (풍속화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.korean_genre?.description 
-            || orientalEducation.korean?.description;
+        return orientalEducation['korean-pungsokdo']?.description 
+            || orientalEducation.korean_default?.description;
       } 
       
       // 진경산수화
@@ -1743,7 +1743,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Korean True-View Landscape (진경산수화)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.korean_jingyeong?.description 
+        return orientalEducation['korean-jingyeong']?.description 
             || orientalEducation.korean_default?.description;
       }
       
@@ -1769,8 +1769,8 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Gongbi (工筆畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.chinese_gongbi?.description 
-            || orientalEducation.chinese_ink?.description;
+        return orientalEducation['chinese-gongbi']?.description 
+            || orientalEducation.chinese_default?.description;
       } 
       
       // 화조화
@@ -1778,7 +1778,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Huaniao (花鳥畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.chinese_huaniao?.description 
+        return orientalEducation['chinese-huaniao']?.description 
             || orientalEducation.chinese_default?.description;
       }
       
@@ -1787,7 +1787,7 @@ const ResultScreen = ({
         // console.log('✅ MATCH: Chinese Ink Wash (水墨畫)');
         // console.log('========================================');
         // console.log('');
-        return orientalEducation.chinese_ink?.description 
+        return orientalEducation['chinese-ink']?.description 
             || orientalEducation.chinese_default?.description;
       }
       
@@ -1807,7 +1807,7 @@ const ResultScreen = ({
       // console.log('✅ MATCH: Japanese Ukiyo-e (浮世繪)');
       // console.log('========================================');
       // console.log('');
-      return orientalEducation.japanese_ukiyoe?.description 
+      return orientalEducation['japanese-ukiyoe']?.description 
           || orientalEducation.japanese_default?.description;
     }
     
