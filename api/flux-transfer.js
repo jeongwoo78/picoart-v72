@@ -2099,31 +2099,36 @@ CRITICAL: Keep prompt field UNDER 150 WORDS to avoid truncation.`;
       }
       
       if (styleId === 'japanese') {
-        // 일본 - 우키요에 (서예 텍스트 선택 추가 + 동물 보존)
+        // 일본 - 우키요에 (Vision 분석 + 동물/사람 보존)
         promptText = `You are converting a photo to Japanese Ukiyo-e woodblock print style.
 
-CRITICAL - ANIMAL PRESERVATION:
-- If photo contains animals (dogs, cats, birds, etc.), you MUST preserve them in the artwork
-- Animals should be drawn in ukiyo-e style with bold outlines and flat colors
-- NEVER remove or omit animals from the composition
+FIRST, analyze the photo carefully:
+1. What is the main subject? (person, animal, landscape, object)
+2. If person: what gender? (male/female)
+3. If animal: what type? (dog, cat, bird, etc.)
+4. How many subjects are there?
 
-Select an appropriate POSITIVE calligraphy text for this image.
+CRITICAL RULES:
+- If photo has ANIMALS (dogs, cats, birds): Draw the animal as the MAIN SUBJECT in ukiyo-e style with bold outlines
+- If photo has PEOPLE: Preserve their gender and draw in traditional Japanese attire
+- NEVER replace animals with people or vice versa
+- PRESERVE the exact subject from the original photo
 
 CALLIGRAPHY TEXT (POSITIVE MEANING ONLY):
-- Choose appropriate positive text (1-4 characters) that makes the viewer feel GOOD
-- MUST be positive, auspicious, beautiful meaning - consumer will see this!
-- Single characters: "福" (blessing), "壽" (longevity), "喜" (joy), "美" (beauty), "和" (harmony), "愛" (love), "樂" (happiness), "春" (spring), "花" (flower), "夢" (dream)
-- Two characters: "吉祥" (good fortune), "平安" (peace), "幸福" (happiness), "浮世" (ukiyo/floating world)
-- Japanese style: "粋" (iki/stylish), "雅" (miyabi/elegant), "桜" (sakura/cherry blossom), "波" (nami/wave), "富士" (Fuji)
+- Choose appropriate positive text (1-4 characters)
+- Single characters: "福" (blessing), "壽" (longevity), "喜" (joy), "美" (beauty), "和" (harmony)
+- Japanese style: "粋" (iki/stylish), "雅" (miyabi/elegant), "桜" (sakura), "波" (wave), "富士" (Fuji)
 
 Return ONLY valid JSON (no markdown):
 {
-  "analysis": "brief photo description including any animals present",
-  "has_animal": true or false,
+  "analysis": "brief photo description",
+  "subject_type": "person" or "animal" or "landscape" or "object",
+  "gender": "male" or "female" or null,
   "animal_type": "dog" or "cat" or "bird" or null,
+  "subject_count": 1,
   "selected_artist": "Japanese Ukiyo-e",
   "calligraphy_text": "positive text you chose",
-  "prompt": "Japanese Ukiyo-e woodblock print style with flat bold colors, strong black outlines, [IF ANIMAL: MUST include the [animal_type] drawn in ukiyo-e style with bold outlines], CLOTHING: traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, Mt Fuji or cherry blossom or waves background. Include ONLY the calligraphy text '[your calligraphy_text]' in vertical brushwork style."
+  "prompt": "Japanese Ukiyo-e woodblock print, [DESCRIBE THE EXACT SUBJECT: if dog then 'adorable dog drawn in ukiyo-e style', if person then 'person in elegant kimono'], flat bold colors, strong black outlines, stylized ukiyo-e aesthetic, Mt Fuji or cherry blossom background, calligraphy text '[your calligraphy_text]'"
 }`;
       }
       
@@ -2825,19 +2830,9 @@ export default async function handler(req, res) {
     // (나중에 visionAnalysis 확인 후 조정됨)
     let landscapeStrengthBoost = false;
     
-    if (selectedStyle.category === 'oriental' && selectedStyle.id === 'japanese') {
-      // 일본 우키요에 (고정)
-      // console.log('Japanese Ukiyo-e - using fixed style');
-      
-      const fallback = fallbackPrompts.japanese;
-      finalPrompt = fallback.prompt;
-      selectedArtist = fallback.name;
-      selectionMethod = 'oriental_fixed';
-      selectionDetails = {
-        style: 'japanese_ukiyoe'
-      };
-      
-    } else if (process.env.ANTHROPIC_API_KEY) {
+    // v72: 일본도 AI Vision 사용 (피사체 분석 + 동물 보존)
+    // 스타일은 우키요에 고정이지만, Vision으로 피사체 파악
+    if (process.env.ANTHROPIC_API_KEY) {
       // console.log(`Trying AI artist selection for ${selectedStyle.name}...`);
       
       // ========================================
