@@ -1760,14 +1760,16 @@ const ResultScreen = ({
     const styleId = selectedStyle.id;
     const artistSource = overrideArtist || aiSelectedArtist;
     
-    // console.log('');
-    // console.log('========================================');
-    // console.log('🔍 ORIENTAL EDUCATION DEBUG (v30)');
-    // console.log('========================================');
-    // console.log('📌 selectedStyle.id:', styleId);
-    // console.log('📌 artistSource:', artistSource);
-    // console.log('========================================');
-    // console.log('');
+    console.log('');
+    console.log('========================================');
+    console.log('🔍 ORIENTAL EDUCATION DEBUG');
+    console.log('========================================');
+    console.log('📌 selectedStyle.id:', styleId);
+    console.log('📌 aiSelectedArtist:', aiSelectedArtist);
+    console.log('📌 overrideArtist:', overrideArtist);
+    console.log('📌 artistSource:', artistSource);
+    console.log('========================================');
+    console.log('');
     
     
     // ========== 한국 전통회화 (3가지) ==========
