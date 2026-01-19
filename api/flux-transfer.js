@@ -1820,7 +1820,7 @@ const fallbackPrompts = {
   
   japanese: {
     name: '일본 우키요에',
-    prompt: 'Japanese Ukiyo-e woodblock print, Ukiyo-e art style, flat areas of bold solid colors, strong clear black outlines, completely flat two-dimensional composition, CLOTHING: MUST transform to traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, stylized simplified forms, elegant refined Japanese aesthetic, authentic Japanese ukiyo-e masterpiece quality, CRITICAL ANTI-HALLUCINATION preserve EXACT number of people from original photo, if 1 person then ONLY 1 person in result, simple scenic background ONLY Mt Fuji or cherry blossom or waves or sky, VISIBLE WOODBLOCK PRINT TEXTURE 20mm+'
+    prompt: 'Japanese Ukiyo-e woodblock print, Ukiyo-e art style, flat areas of bold solid colors, strong clear black outlines, completely flat two-dimensional composition, CLOTHING: MUST transform to traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, stylized simplified forms, elegant refined Japanese aesthetic, authentic Japanese ukiyo-e masterpiece quality, CRITICAL ANTI-HALLUCINATION preserve EXACT number of people from original photo, if 1 person then ONLY 1 person in result, CRITICAL ANIMAL PRESERVATION if photo has animals (dogs cats birds) MUST include them drawn in ukiyo-e style with bold outlines, simple scenic background ONLY Mt Fuji or cherry blossom or waves or sky, VISIBLE WOODBLOCK PRINT TEXTURE 20mm+'
   },
   
   masters: {
@@ -2099,8 +2099,13 @@ CRITICAL: Keep prompt field UNDER 150 WORDS to avoid truncation.`;
       }
       
       if (styleId === 'japanese') {
-        // 일본 - 우키요에 (서예 텍스트 선택 추가)
+        // 일본 - 우키요에 (서예 텍스트 선택 추가 + 동물 보존)
         promptText = `You are converting a photo to Japanese Ukiyo-e woodblock print style.
+
+CRITICAL - ANIMAL PRESERVATION:
+- If photo contains animals (dogs, cats, birds, etc.), you MUST preserve them in the artwork
+- Animals should be drawn in ukiyo-e style with bold outlines and flat colors
+- NEVER remove or omit animals from the composition
 
 Select an appropriate POSITIVE calligraphy text for this image.
 
@@ -2113,10 +2118,12 @@ CALLIGRAPHY TEXT (POSITIVE MEANING ONLY):
 
 Return ONLY valid JSON (no markdown):
 {
-  "analysis": "brief photo description",
+  "analysis": "brief photo description including any animals present",
+  "has_animal": true or false,
+  "animal_type": "dog" or "cat" or "bird" or null,
   "selected_artist": "Japanese Ukiyo-e",
   "calligraphy_text": "positive text you chose",
-  "prompt": "Japanese Ukiyo-e woodblock print style with flat bold colors, strong black outlines, CLOTHING: traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, Mt Fuji or cherry blossom or waves background. Include ONLY the calligraphy text '[your calligraphy_text]' in vertical brushwork style."
+  "prompt": "Japanese Ukiyo-e woodblock print style with flat bold colors, strong black outlines, [IF ANIMAL: MUST include the [animal_type] drawn in ukiyo-e style with bold outlines], CLOTHING: traditional Japanese attire (elegant kimono for women, hakama pants with haori jacket for men), decorative patterns, Mt Fuji or cherry blossom or waves background. Include ONLY the calligraphy text '[your calligraphy_text]' in vertical brushwork style."
 }`;
       }
       
