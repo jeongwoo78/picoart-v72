@@ -55,6 +55,15 @@ import {
 } from './masterworks.js';
 
 // ========================================
+// v72: Anthropic 클라이언트 (일본 우키요에 Vision용)
+// ========================================
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropicClient = process.env.ANTHROPIC_API_KEY 
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
+
+// ========================================
 // v66: 통합 화풍 프롬프트
 // ========================================
 import {
@@ -2832,10 +2841,13 @@ export default async function handler(req, res) {
     
     // v72: 일본 우키요에 - Vision 분석 + 고정 프롬프트
     if (selectedStyle.category === 'oriental' && selectedStyle.id === 'japanese') {
+      console.log('🇯🇵 Japanese Ukiyo-e - Vision + Fixed Prompt mode');
+      
       // 1. Vision 분석으로 피사체 파악
       let subjectInfo = '';
       
-      if (process.env.ANTHROPIC_API_KEY) {
+      if (anthropicClient) {
+        console.log('   🔑 anthropicClient ready, attempting Vision...');
         try {
           const visionPrompt = `Analyze this photo briefly. Return ONLY valid JSON:
 {
@@ -2858,23 +2870,33 @@ export default async function handler(req, res) {
           });
           
           const visionText = visionResponse.content[0]?.text || '{}';
+          console.log('   📝 Vision raw response:', visionText);
+          
           const visionData = JSON.parse(visionText.replace(/```json\n?|\n?```/g, '').trim());
+          console.log('   📊 Vision parsed:', JSON.stringify(visionData));
           
           // 피사체 정보 구성
           if (visionData.subject_type === 'animal' && visionData.animal_type) {
-            subjectInfo = `CRITICAL: The main subject is a ${visionData.animal_type}. Draw the ${visionData.animal_type} as the central subject in ukiyo-e style with bold outlines. `;
+            subjectInfo = `CRITICAL: The main subject is a ${visionData.animal_type}. Draw the ${visionData.animal_type} as the central subject in ukiyo-e style with bold outlines. DO NOT replace the ${visionData.animal_type} with people. `;
+            console.log('   🐕 Animal detected:', visionData.animal_type);
           } else if (visionData.subject_type === 'person') {
             const genderInfo = visionData.gender === 'male' ? 'male person in hakama' : 
                               visionData.gender === 'female' ? 'female person in elegant kimono' : 
                               'person in traditional Japanese attire';
             subjectInfo = `CRITICAL: Draw the ${genderInfo} as shown in the photo. `;
+            console.log('   👤 Person detected:', visionData.gender);
+          } else {
+            console.log('   ❓ Subject type:', visionData.subject_type);
           }
           
-          console.log('   🔍 Vision:', visionData.subject_type, visionData.animal_type || '');
         } catch (e) {
-          console.log('   ⚠️ Vision analysis skipped:', e.message);
+          console.log('   ⚠️ Vision analysis error:', e.message);
         }
+      } else {
+        console.log('   ❌ ANTHROPIC_API_KEY not found, skipping Vision');
       }
+      
+      console.log('   📝 subjectInfo:', subjectInfo || '(empty)');
       
       // 2. 고정 프롬프트 + 피사체 정보 결합
       const basePrompt = fallbackPrompts.japanese.prompt;
