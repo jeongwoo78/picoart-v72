@@ -13,6 +13,8 @@ import { orientalBasicInfo, orientalOverview, orientalEducation } from '../data/
 import { oneclickMovementsPrimary, oneclickMovementsSecondary } from '../data/oneclickMovementsEducation';
 import { oneclickMastersPrimary, oneclickMastersSecondary } from '../data/oneclickMastersEducation';
 import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
+// 단독변환용 교육자료
+import { educationContent } from '../data/educationContent';
 import { saveToGallery } from './GalleryScreen';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 // v71: displayConfig 컨트롤 타워
@@ -61,13 +63,30 @@ const ResultScreen = ({
   // v72: 1차 교육자료 (원본 화면용)
   const getPrimaryEducation = () => {
     const category = selectedStyle?.category;
-    if (category === 'movements') {
-      return { ...oneclickMovementsPrimary, title: '2,500년 서양미술사 관통' };
-    } else if (category === 'masters') {
-      return oneclickMastersPrimary;
-    } else if (category === 'oriental') {
-      return oneclickOrientalPrimary;
+    
+    // 원클릭: 카테고리 전체 소개
+    if (isFullTransform) {
+      if (category === 'movements') {
+        return { ...oneclickMovementsPrimary, title: '2,500년 서양미술사 관통' };
+      } else if (category === 'masters') {
+        return oneclickMastersPrimary;
+      } else if (category === 'oriental') {
+        return oneclickOrientalPrimary;
+      }
     }
+    
+    // 단독변환: 해당 스타일의 1차 교육자료
+    if (!isFullTransform && selectedStyle?.id) {
+      const styleId = selectedStyle.id;
+      if (category === 'movements' && educationContent.movements[styleId]) {
+        return educationContent.movements[styleId];
+      } else if (category === 'masters' && educationContent.masters[styleId]) {
+        return educationContent.masters[styleId];
+      } else if (category === 'oriental' && educationContent.oriental[styleId]) {
+        return educationContent.oriental[styleId];
+      }
+    }
+    
     return null;
   };
   
@@ -1936,7 +1955,7 @@ const ResultScreen = ({
         if (viewIndex < totalResults - 1) {
           const newIndex = viewIndex + 1;
           setViewIndex(newIndex);
-          if (isFullTransform && newIndex >= 0) setCurrentIndex(newIndex);
+          if (isFullTransform) setCurrentIndex(newIndex >= 0 ? newIndex : 0);
         }
       } else {
         // 오른쪽 스와이프 → 이전
@@ -2148,14 +2167,51 @@ const ResultScreen = ({
           </div>
         )}
 
-        {/* 원클릭 네비게이션 (교육자료 하단) */}
+        {/* 다시 시도 버튼 (현재 보고 있는 결과가 실패한 경우에만 표시) */}
+        {isFullTransform && currentResult && !currentResult.success && viewIndex >= 0 && (
+          <div className="retry-section">
+            {isRetrying ? (
+              <div className="retry-in-progress">
+                <div className="spinner-medium"></div>
+                <p className="retry-text">🎨 AI가 다시 변환 중입니다...</p>
+              </div>
+            ) : (
+              <div className="retry-prompt">
+                <div className="retry-icon">🎨</div>
+                <p className="fail-message">변환에 실패하였습니다.</p>
+                <button 
+                  className="btn btn-retry"
+                  onClick={handleRetry}
+                >
+                  <span className="btn-icon">✨</span>
+                  {failedCount > 1 ? `전체 다시 시도` : '다시 시도'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 거장(AI) 대화 섹션 - 거장 카테고리 + 결과 화면일 때만 표시 */}
+        {displayCategory === 'masters' && currentMasterKey && viewIndex >= 0 && (
+          <MasterChat
+            key={currentMasterKey}
+            masterKey={currentMasterKey}
+            onRetransform={(correctionPrompt) => handleMasterRetransform(correctionPrompt, currentMasterKey)}
+            isRetransforming={isCurrentMasterWorking}
+            retransformCost={100}
+            savedChatData={masterChatData[currentMasterKey]}
+            onChatDataChange={(data) => updateMasterChatData(currentMasterKey, data)}
+          />
+        )}
+
+        {/* 원클릭 네비게이션 (채팅창 아래, 버튼 위) */}
         {isFullTransform && (
           <div className="fullTransform-nav">
             <button 
               onClick={() => {
-                if (viewIndex === -1) return;  // 원본이면 더 이전 없음
+                if (viewIndex === -1) return;
                 if (viewIndex === 0) {
-                  setViewIndex(-1);  // 첫 결과 → 원본
+                  setViewIndex(-1);
                 } else {
                   setViewIndex(v => v - 1);
                   setCurrentIndex(i => i - 1);
@@ -2168,16 +2224,12 @@ const ResultScreen = ({
               ◀ 이전
             </button>
             <div className="nav-dots">
-              {/* 📚 원본 도트 */}
               <button
-                className={`nav-dot edu ${viewIndex === -1 ? 'active' : ''}`}
+                className={`nav-dot ${viewIndex === -1 ? 'active' : ''}`}
                 onClick={() => !isRetrying && setViewIndex(-1)}
                 disabled={isRetrying}
                 style={{ opacity: isRetrying ? 0.5 : 1 }}
-              >
-                📚
-              </button>
-              {/* 결과 도트들 */}
+              />
               {fullTransformResults.map((_, idx) => (
                 <button
                   key={idx}
@@ -2196,7 +2248,8 @@ const ResultScreen = ({
             <button 
               onClick={() => {
                 if (viewIndex === -1) {
-                  setViewIndex(0);  // 원본 → 첫 결과
+                  setViewIndex(0);
+                  setCurrentIndex(0);  // 동기화
                 } else if (viewIndex < fullTransformResults.length - 1) {
                   setViewIndex(v => v + 1);
                   setCurrentIndex(i => i + 1);
@@ -2223,11 +2276,9 @@ const ResultScreen = ({
             </button>
             <div className="nav-dots">
               <button
-                className={`nav-dot edu ${viewIndex === -1 ? 'active' : ''}`}
+                className={`nav-dot ${viewIndex === -1 ? 'active' : ''}`}
                 onClick={() => setViewIndex(-1)}
-              >
-                📚
-              </button>
+              />
               <button
                 className={`nav-dot ${viewIndex === 0 ? 'active' : ''}`}
                 onClick={() => setViewIndex(0)}
@@ -2241,43 +2292,6 @@ const ResultScreen = ({
               다음 ▶
             </button>
           </div>
-        )}
-
-        {/* 다시 시도 버튼 (현재 보고 있는 결과가 실패한 경우에만 표시) */}
-        {isFullTransform && currentResult && !currentResult.success && (
-          <div className="retry-section">
-            {isRetrying ? (
-              <div className="retry-in-progress">
-                <div className="spinner-medium"></div>
-                <p className="retry-text">🎨 AI가 다시 변환 중입니다...</p>
-              </div>
-            ) : (
-              <div className="retry-prompt">
-                <div className="retry-icon">🎨</div>
-                <p className="fail-message">변환에 실패하였습니다.</p>
-                <button 
-                  className="btn btn-retry"
-                  onClick={handleRetry}
-                >
-                  <span className="btn-icon">✨</span>
-                  {failedCount > 1 ? `전체 다시 시도` : '다시 시도'}
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 거장(AI) 대화 섹션 - 거장 카테고리일 때만 표시 (v68) */}
-        {displayCategory === 'masters' && currentMasterKey && (
-          <MasterChat
-            key={currentMasterKey}
-            masterKey={currentMasterKey}
-            onRetransform={(correctionPrompt) => handleMasterRetransform(correctionPrompt, currentMasterKey)}
-            isRetransforming={isCurrentMasterWorking}
-            retransformCost={100}
-            savedChatData={masterChatData[currentMasterKey]}
-            onChatDataChange={(data) => updateMasterChatData(currentMasterKey, data)}
-          />
         )}
 
         {/* Action Buttons */}
@@ -2745,17 +2759,6 @@ const ResultScreen = ({
         .nav-dot.active {
           background: #667eea;
           transform: scale(1.3);
-        }
-        .nav-dot.edu {
-          width: auto;
-          height: auto;
-          padding: 2px 6px;
-          font-size: 14px;
-          border-radius: 8px;
-          background: #f0f0f0;
-        }
-        .nav-dot.edu.active {
-          background: #667eea;
         }
         
         /* 원클릭 이미지 */
