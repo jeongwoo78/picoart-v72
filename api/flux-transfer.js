@@ -2830,9 +2830,60 @@ export default async function handler(req, res) {
     // (나중에 visionAnalysis 확인 후 조정됨)
     let landscapeStrengthBoost = false;
     
-    // v72: 일본도 AI Vision 사용 (피사체 분석 + 동물 보존)
-    // 스타일은 우키요에 고정이지만, Vision으로 피사체 파악
-    if (process.env.ANTHROPIC_API_KEY) {
+    // v72: 일본 우키요에 - Vision 분석 + 고정 프롬프트
+    if (selectedStyle.category === 'oriental' && selectedStyle.id === 'japanese') {
+      // 1. Vision 분석으로 피사체 파악
+      let subjectInfo = '';
+      
+      if (process.env.ANTHROPIC_API_KEY) {
+        try {
+          const visionPrompt = `Analyze this photo briefly. Return ONLY valid JSON:
+{
+  "subject_type": "person" or "animal" or "landscape" or "object",
+  "animal_type": "dog" or "cat" or "bird" or null,
+  "person_count": number or 0,
+  "gender": "male" or "female" or "mixed" or null
+}`;
+          
+          const visionResponse = await anthropicClient.messages.create({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 200,
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: image } },
+                { type: 'text', text: visionPrompt }
+              ]
+            }]
+          });
+          
+          const visionText = visionResponse.content[0]?.text || '{}';
+          const visionData = JSON.parse(visionText.replace(/```json\n?|\n?```/g, '').trim());
+          
+          // 피사체 정보 구성
+          if (visionData.subject_type === 'animal' && visionData.animal_type) {
+            subjectInfo = `CRITICAL: The main subject is a ${visionData.animal_type}. Draw the ${visionData.animal_type} as the central subject in ukiyo-e style with bold outlines. `;
+          } else if (visionData.subject_type === 'person') {
+            const genderInfo = visionData.gender === 'male' ? 'male person in hakama' : 
+                              visionData.gender === 'female' ? 'female person in elegant kimono' : 
+                              'person in traditional Japanese attire';
+            subjectInfo = `CRITICAL: Draw the ${genderInfo} as shown in the photo. `;
+          }
+          
+          console.log('   🔍 Vision:', visionData.subject_type, visionData.animal_type || '');
+        } catch (e) {
+          console.log('   ⚠️ Vision analysis skipped:', e.message);
+        }
+      }
+      
+      // 2. 고정 프롬프트 + 피사체 정보 결합
+      const basePrompt = fallbackPrompts.japanese.prompt;
+      finalPrompt = subjectInfo + basePrompt;
+      selectedArtist = '일본 우키요에';
+      selectionMethod = 'oriental_fixed_with_vision';
+      selectionDetails = { style: 'japanese_ukiyoe' };
+      
+    } else if (process.env.ANTHROPIC_API_KEY) {
       // console.log(`Trying AI artist selection for ${selectedStyle.name}...`);
       
       // ========================================
