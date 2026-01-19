@@ -1815,7 +1815,7 @@ const fallbackPrompts = {
   
   chinese: {
     name: '중국 전통화',
-    prompt: 'Chinese traditional painting, classical Chinese art style, GENDER PRESERVATION preserve exact gender and facial features from original photo, Choose appropriate Chinese style: Shuimohua ink wash for landscapes with monochrome gradations, Gongbi meticulous painting for people with fine detailed brushwork and rich colors, Huaniao bird-and-flower for animals with precise naturalistic rendering, Chinese aesthetic principles, SINGLE UNIFIED COMPOSITION, VISIBLE INK BRUSH TEXTURE 20mm+'
+    prompt: 'Chinese traditional painting, classical Chinese art style, GENDER PRESERVATION preserve exact gender and facial features from original photo, Choose appropriate Chinese style: Shuimohua ink wash for landscapes with monochrome gradations, Gongbi meticulous painting for people and animals with fine detailed brushwork and rich colors, Chinese aesthetic principles, SINGLE UNIFIED COMPOSITION, VISIBLE INK BRUSH TEXTURE 20mm+'
   },
   
   japanese: {
@@ -2039,7 +2039,7 @@ CRITICAL: Keep prompt field UNDER 150 WORDS to avoid truncation.`;
         // 중국 - Claude가 3가지 스타일 중 선택
         promptText = `Analyze this photo and select the BEST Chinese traditional painting style.
 
-You must choose ONE of these THREE styles:
+You must choose ONE of these TWO styles:
 
 Style 1: Chinese Ink Wash Painting (水墨畫 Shuimohua)
 - Best for: landscapes, mountains, nature, trees, contemplative subjects, simple compositions
@@ -2048,18 +2048,14 @@ Style 1: Chinese Ink Wash Painting (水墨畫 Shuimohua)
 - CLOTHING: If people present, MUST dress in traditional Chinese hanfu (long flowing dress with wide sleeves for women, scholar's robe with wide sleeves for men)
 
 Style 2: Chinese Gongbi Meticulous Painting (工筆畫)
-- Best for: portraits, people, detailed subjects, colorful compositions
+- Best for: portraits, people, animals (dogs, cats, birds, etc.), detailed subjects, colorful compositions
 - Characteristics: EXTREMELY FINE detailed brushwork with DELICATE HAIR-THIN brush lines, SILK SURFACE TEXTURE throughout (not paper), rich MINERAL PIGMENT colors (malachite green, azurite blue, cinnabar red), ornate decorative patterns, TRADITIONAL PAINTED FEEL not digital, imperial court quality, VISIBLE FINE BRUSHSTROKES showing meticulous hand-painted technique
-- When: Photo has people, faces, or needs detailed colorful treatment
+- When: Photo has people, faces, animals, or needs detailed colorful treatment
 - CRITICAL: Must look like TRADITIONAL HAND-PAINTED silk painting, VISIBLE brush texture, traditional painted quality
 - CLOTHING: MUST dress in traditional Chinese hanfu (long flowing dress with wide sleeves for women, scholar's robe with wide sleeves for men), NOT modern clothing
 
-Style 3: Chinese Huaniao Bird-and-Flower Painting (花鳥畫)
-- Best for: birds, flowers, animals (dogs, cats, rabbits), fish, insects, any natural creatures
-- Characteristics: Traditional genre includes "flowers, birds, fish, insects" (花鳥魚蟲) PLUS animals, detailed naturalistic rendering, precise brushwork for fur/feathers/petals, delicate colors, symbolic meanings
-- When: Photo has birds, flowers, animals, or plants
-
 Analyze the photo and choose the MOST suitable style.
+NOTE: For animals (dogs, cats, birds, flowers), use Gongbi style with its detailed brushwork.
 
 CRITICAL INSTRUCTIONS FOR PROMPT GENERATION:
 
@@ -2092,8 +2088,8 @@ Return ONLY valid JSON (no markdown):
   "gender": "male" or "female" or null,
   "age_range": "baby/child/teen/young_adult/adult/middle_aged/elderly" or null,
   "physical_description": "for MALE: strong jaw, angular face, short hair, broad shoulders etc. For FEMALE: soft features, delicate face etc." or null,
-  "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi" or "Chinese Huaniao",
-  "selected_style": "ink_wash" or "gongbi" or "huaniao",
+  "selected_artist": "Chinese Ink Wash" or "Chinese Gongbi",
+  "selected_style": "ink_wash" or "gongbi",
   "calligraphy_text": "positive text you chose (Chinese characters only)",
   "reason": "why this style fits (1 sentence)",
   "prompt": "KEEP UNDER 150 WORDS. [Gender rule] Chinese [style] with key characteristics. Traditional hanfu clothing. Calligraphy text '[your calligraphy_text]' in Chinese characters (Hanzi) only."
