@@ -50,7 +50,7 @@ const App = () => {
       setResultImage(null);
       setAiSelectedArtist(null);
       setAiSelectedWork(null);
-      setCurrentMasterIndex(1);  // v68: 첫 번째 결과가 먼저 보이도록 (0=원본, 1=첫결과)
+      setCurrentMasterIndex(0);  // v72: 첫 번째 결과 (viewIndex가 원본/결과 전환 담당)
       // console.log('✅ App.jsx received fullTransform results:', result.results.length);
       // 디버그: 각 결과의 aiSelectedArtist 확인
       result.results.forEach((r, i) => {
