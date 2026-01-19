@@ -58,7 +58,23 @@ const ResultScreen = ({
   const [touchStartY, setTouchStartY] = useState(0);
   
   // v72: viewIndex - 원본/결과 스와이프용 (-1: 원본, 0~n: 결과)
-  const [viewIndex, setViewIndex] = useState(0);  // 기본값: 첫 번째 결과
+  // 초기값: currentIndex와 동기화 (갤러리 갔다와도 유지)
+  const [viewIndex, setViewIndex] = useState(appCurrentIndex || 0);
+  
+  // viewIndex가 결과 범위를 벗어나지 않도록 보정 (-1은 원본이므로 허용)
+  const maxViewIndex = isFullTransform 
+    ? fullTransformResults.length - 1 
+    : 0;
+  const safeViewIndex = viewIndex === -1 
+    ? -1 
+    : Math.max(0, Math.min(viewIndex, maxViewIndex));
+  
+  // safeViewIndex와 viewIndex가 다르면 동기화
+  React.useEffect(() => {
+    if (viewIndex !== safeViewIndex) {
+      setViewIndex(safeViewIndex);
+    }
+  }, [viewIndex, safeViewIndex]);
   
   // v72: 1차 교육자료 (원본 화면용)
   const getPrimaryEducation = () => {
@@ -105,8 +121,13 @@ const ResultScreen = ({
   // 실패한 결과 개수
   const failedCount = results.filter(r => !r.success).length;
   
+  // currentIndex 범위 체크 (results 범위 내로 보정)
+  const safeCurrentIndex = isFullTransform 
+    ? Math.max(0, Math.min(currentIndex, results.length - 1))
+    : 0;
+  
   // 현재 보여줄 결과
-  const currentResult = isFullTransform ? results[currentIndex] : null;
+  const currentResult = isFullTransform ? results[safeCurrentIndex] : null;
   // 단독변환: 재시도 성공 시 singleRetryResult 사용
   const [singleRetryResultState, setSingleRetryResultState] = useState(null);
   const displayImage = isFullTransform 
@@ -2005,9 +2026,9 @@ const ResultScreen = ({
             </div>
           </div>
         )}
-        {isFullTransform && viewIndex >= 0 && (
+        {isFullTransform && viewIndex >= 0 && results[viewIndex] && (
           <div className="result-image-wrapper">
-            <img src={currentMasterResultImage || displayImage} alt="변환 결과" className="result-image" />
+            <img src={masterResultImages[getMasterKey(results[viewIndex]?.aiSelectedArtist)] || results[viewIndex]?.resultUrl} alt="변환 결과" className="result-image" />
           </div>
         )}
 
