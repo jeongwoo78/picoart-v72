@@ -689,11 +689,18 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           <div className="preview">
             <img src={URL.createObjectURL(photo)} alt="원본 사진" />
             <div className="preview-info">
-              <div className="preview-style">
-                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
-              </div>
-              <div className="preview-subtitle">
-                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              <div className="preview-header">
+                <span className="preview-icon">
+                  {getStyleIcon(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                </span>
+                <div className="preview-text">
+                  <div className="preview-style">
+                    {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                  </div>
+                  <div className="preview-subtitle">
+                    {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+                  </div>
+                </div>
               </div>
             </div>
             {getSingleEducationContent(selectedStyle) && (
@@ -779,6 +786,18 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           padding: 16px; 
           text-align: left;
           border-bottom: 2px solid #e0e0e0;
+        }
+        .preview-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .preview-icon {
+          font-size: 2.2rem;
+          line-height: 1;
+        }
+        .preview-text {
+          flex: 1;
         }
         .preview-style { 
           font-size: 1.35rem; 

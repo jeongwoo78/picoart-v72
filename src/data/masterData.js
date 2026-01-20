@@ -293,7 +293,7 @@ export const ORIENTAL = {
   korean: {
     id: 'korean',
     ko: '한국 전통회화',
-    en: 'Korean Traditional Painting',
+    en: 'Korean Traditional Art',
     icon: '🎎',
     description: '여백과 절제의 미',
     styles: {
@@ -317,7 +317,7 @@ export const ORIENTAL = {
   chinese: {
     id: 'chinese',
     ko: '중국 전통회화',
-    en: 'Chinese Traditional Painting',
+    en: 'Chinese Traditional Art',
     icon: '🐉',
     description: '붓과 먹의 철학',
     styles: {
@@ -336,7 +336,7 @@ export const ORIENTAL = {
   japanese: {
     id: 'japanese',
     ko: '일본 전통회화',
-    en: 'Japanese Traditional Painting',
+    en: 'Japanese Traditional Art',
     icon: '🗾',
     description: '섬세한 관찰과 대담함',
     styles: {

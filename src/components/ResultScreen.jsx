@@ -1912,11 +1912,18 @@ const ResultScreen = ({
           <div className="preview-card">
             <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
             <div className="preview-info">
-              <div className="preview-style">
-                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
-              </div>
-              <div className="preview-subtitle">
-                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              <div className="preview-header">
+                <span className="preview-icon">
+                  {getStyleIcon(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                </span>
+                <div className="preview-text">
+                  <div className="preview-style">
+                    {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                  </div>
+                  <div className="preview-subtitle">
+                    {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="edu-card primary">
@@ -1937,11 +1944,18 @@ const ResultScreen = ({
           <div className="preview-card">
             <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
             <div className="preview-info">
-              <div className="preview-style">
-                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
-              </div>
-              <div className="preview-subtitle">
-                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              <div className="preview-header">
+                <span className="preview-icon">
+                  {getStyleIcon(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                </span>
+                <div className="preview-text">
+                  <div className="preview-style">
+                    {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+                  </div>
+                  <div className="preview-subtitle">
+                    {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+                  </div>
+                </div>
               </div>
             </div>
             <div className="edu-card primary">
@@ -1998,7 +2012,13 @@ const ResultScreen = ({
             {/* Card Header */}
             <div className="card-header">
               <div className="technique-icon">
-                {isFullTransform ? (currentResult?.style?.icon || '🎨') : (selectedStyle.icon || '🎨')}
+                {/* v73: 통합 함수 사용 */}
+                {(() => {
+                  const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
+                  const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
+                  const artistName = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
+                  return getStyleIcon(category, styleId, artistName);
+                })()}
               </div>
               <div>
                 <h2>
@@ -2684,6 +2704,18 @@ const ResultScreen = ({
           padding: 16px;
           text-align: left;
           border-bottom: 2px solid #e0e0e0;
+        }
+        .preview-card .preview-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+        }
+        .preview-card .preview-icon {
+          font-size: 2.2rem;
+          line-height: 1;
+        }
+        .preview-card .preview-text {
+          flex: 1;
         }
         .preview-card .preview-style {
           font-size: 1.35rem;
