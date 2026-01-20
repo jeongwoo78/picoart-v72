@@ -53,9 +53,9 @@ const StyleSelection = ({ onSelect }) => {
     { id: 'lichtenstein-master', name: '로이 리히텐슈타인', nameEn: 'Roy Lichtenstein', category: 'masters', icon: '💥', description: '1923-1997 | 팝아트' },
     
     // 동양화
-    { id: 'korean', name: '한국 전통회화', nameEn: 'Korean Art', category: 'oriental', icon: '🎎', description: '여백과 절제의 미' },
-    { id: 'chinese', name: '중국 전통회화', nameEn: 'Chinese Art', category: 'oriental', icon: '🐉', description: '붓과 먹의 철학' },
-    { id: 'japanese', name: '일본 전통회화', nameEn: 'Japanese Art', category: 'oriental', icon: '🗾', description: '섬세한 관찰과 대담함' }
+    { id: 'korean', name: '한국 전통회화', nameEn: 'Korean Traditional Art', category: 'oriental', icon: '🎎', description: '여백과 절제의 미' },
+    { id: 'chinese', name: '중국 전통회화', nameEn: 'Chinese Traditional Art', category: 'oriental', icon: '🐉', description: '붓과 먹의 철학' },
+    { id: 'japanese', name: '일본 전통회화', nameEn: 'Japanese Traditional Art', category: 'oriental', icon: '🗾', description: '섬세한 관찰과 대담함' }
   ];
 
   // 대 카테고리 정의 (v51: 11개 사조)

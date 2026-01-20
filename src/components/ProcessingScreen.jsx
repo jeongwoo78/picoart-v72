@@ -694,7 +694,7 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                   : selectedStyle?.category === 'movements'
                     ? getMovementDisplayInfo(selectedStyle?.name, null).title
                     : selectedStyle?.category === 'oriental'
-                      ? `${selectedStyle?.name}(${selectedStyle?.nameEn || 'Traditional Painting'})`
+                      ? `${selectedStyle?.name}(${selectedStyle?.nameEn || 'Traditional Art'})`
                       : (selectedStyle?.name || '스타일 변환')}
               </div>
               {selectedStyle?.category === 'masters' ? (
