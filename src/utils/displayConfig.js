@@ -907,13 +907,13 @@ export function getMasterInfo(artistName) {
 // MOVEMENTS, ORIENTAL, MASTERS는 파일 상단에서 import됨
 
 /**
- * 카테고리 아이콘 가져오기 (원클릭용)
+ * 카테고리 아이콘 가져오기 (원클릭용 - 메인화면과 동일)
  * @param {string} category - 'movements' | 'masters' | 'oriental'
  * @returns {string} 카테고리 대표 이모지
  */
 export function getCategoryIcon(category) {
-  if (category === 'masters') return '👨‍🎨';
-  if (category === 'movements') return '🖼️';
+  if (category === 'masters') return '⭐';
+  if (category === 'movements') return '🎨';
   if (category === 'oriental') return '🎎';
   return '🎨';
 }
