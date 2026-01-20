@@ -10,7 +10,7 @@ import { oneclickMovementsPrimary, oneclickMovementsSecondary } from '../data/on
 import { oneclickMastersPrimary, oneclickMastersSecondary } from '../data/oneclickMastersEducation';
 import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
 // v73: displayConfig 통합 함수
-import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
+import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getCategoryIcon, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
 
 const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
@@ -449,7 +449,8 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
     
     if (cat === 'masters') {
       const masterInfo = getMasterInfo(artist);
-      return masterInfo.movement || '거장';
+      // v73: 결과 미리보기니까 tagline 사용
+      return masterInfo.tagline || '거장';
     } else if (cat === 'movements') {
       const movementInfo = getMovementDisplayInfo(styleName, artist);
       return movementInfo.subtitle;
@@ -609,7 +610,14 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
               <div className="preview">
                 <img src={URL.createObjectURL(photo)} alt="원본 사진" />
                 <div className="preview-info">
-                  <div className="preview-style">{selectedStyle?.name || '전체 변환'}</div>
+                  <div className="preview-header">
+                    <span className="preview-icon">
+                      {getCategoryIcon(selectedStyle?.category)}
+                    </span>
+                    <div className="preview-text">
+                      <div className="preview-style">{selectedStyle?.name || '전체 변환'}</div>
+                    </div>
+                  </div>
                 </div>
                 <div className="edu-card primary">
                   <p>{getPrimaryEducation().content}</p>
@@ -623,10 +631,17 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
               <div className="preview">
                 <img src={previewResult.resultUrl} alt="" />
                 <div className="preview-info">
-                  <div className="preview-style">
-                    {getTitle(previewResult)}
+                  <div className="preview-header">
+                    <span className="preview-icon">
+                      {getStyleIcon(previewResult?.style?.category, previewResult?.style?.id, previewResult?.aiSelectedArtist)}
+                    </span>
+                    <div className="preview-text">
+                      <div className="preview-style">
+                        {getTitle(previewResult)}
+                      </div>
+                      <div className="preview-subtitle">{getSubtitle(previewResult)}</div>
+                    </div>
                   </div>
-                  <div className="preview-subtitle">{getSubtitle(previewResult)}</div>
                 </div>
                 {previewEdu && (
                   <div className="edu-card secondary">
