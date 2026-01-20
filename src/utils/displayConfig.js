@@ -7,8 +7,12 @@
 // API 응답 → 정규화 → 교육자료/UI 표시
 //
 // v72: 화가 풀네임 별칭 추가 (Sandro Botticelli → botticelli 등)
+// v73: 통합 스타일 표시 함수 추가
 //
 // ========================================
+
+// v73: masterData에서 스타일 정보 import
+import { MOVEMENTS, ORIENTAL, MASTERS } from '../data/masterData';
 
 // ========================================
 // 1. 표준 키 목록
@@ -900,7 +904,19 @@ export function getMasterInfo(artistName) {
 }
 
 // ========== v73: 통합 스타일 표시 함수 ==========
-import { MOVEMENTS, ORIENTAL, MASTERS } from '../data/masterData';
+// MOVEMENTS, ORIENTAL, MASTERS는 파일 상단에서 import됨
+
+/**
+ * 카테고리 아이콘 가져오기 (원클릭용)
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @returns {string} 카테고리 대표 이모지
+ */
+export function getCategoryIcon(category) {
+  if (category === 'masters') return '👨‍🎨';
+  if (category === 'movements') return '🖼️';
+  if (category === 'oriental') return '🎎';
+  return '🎨';
+}
 
 /**
  * 스타일 아이콘 가져오기
@@ -1002,6 +1018,7 @@ export default {
   getMovementDisplayInfo,
   getOrientalDisplayInfo,
   getMasterInfo,
+  getCategoryIcon,
   getStyleIcon,
   getStyleTitle,
   getStyleSubtitle
