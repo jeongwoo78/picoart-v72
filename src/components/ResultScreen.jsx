@@ -1896,7 +1896,6 @@ const ResultScreen = ({
         
         {/* Header */}
         <div className="result-header">
-          <h1>✨ 완성!</h1>
           <p className="result-subtitle">
             {isFullTransform 
               ? `${selectedStyle.name} (${currentIndex + 1}/${fullTransformResults.length})`
@@ -2015,25 +2014,35 @@ const ResultScreen = ({
                 </h2>
                 <p className="technique-subtitle">
                   <span className="artist-name">
-                    {/* v67: 새 표기 형식 - 부제 */}
-                    {/* 거장: 사조(시기) */}
-                    {/* 미술사조: 화가명(생몰연도) */}
-                    {/* 동양화: 스타일(영문) */}
+                    {/* v73: 원클릭/단독 분기 */}
+                    {/* 원클릭: 사조=description, 거장=tagline, 동양화=description */}
+                    {/* 단독: 사조=화가명, 거장=tagline, 동양화=스타일명 */}
                     {(() => {
                       const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
                       const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
                       
                       if (category === 'masters') {
-                        // API 실패 시 selectedStyle.name 사용
                         const artistForDisplay = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
                         const masterInfo = getMasterInfo(artistForDisplay);
-                        return masterInfo.movement || '거장';
+                        return masterInfo.tagline || '거장';
                       } else if (category === 'movements') {
-                        const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
-                        return movementInfo.subtitle;
+                        if (isFullTransform) {
+                          // 원클릭: description 사용
+                          return currentResult?.style?.description || '서양미술사';
+                        } else {
+                          // 단독: 화가명
+                          const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
+                          return movementInfo.subtitle;
+                        }
                       } else if (category === 'oriental') {
-                        const orientalInfo = getOrientalDisplayInfo(displayArtist);
-                        return orientalInfo.subtitle;
+                        if (isFullTransform) {
+                          // 원클릭: description 사용
+                          return currentResult?.style?.description || '동양화';
+                        } else {
+                          // 단독: 스타일명
+                          const orientalInfo = getOrientalDisplayInfo(displayArtist);
+                          return orientalInfo.subtitle;
+                        }
                       }
                       return formatArtistName(displayArtist);
                     })()}

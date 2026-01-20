@@ -29,7 +29,7 @@ export const MOVEMENTS = {
     en: 'Medieval Art',
     period: '5~15세기',
     icon: '⛪',
-    description: '비잔틴·고딕·이슬람의 신성함',
+    description: '신을 향한 경건한 표현',
     subtitle: '비잔틴 · 고딕 · 이슬람 세밀화'
   },
   renaissance: {
@@ -47,7 +47,7 @@ export const MOVEMENTS = {
     en: 'Baroque',
     period: '17~18세기',
     icon: '👑',
-    description: '극적이고 웅장한 표현',
+    description: '빛과 어둠의 드라마',
     subtitle: '카라바조 · 렘브란트 · 벨라스케스'
   },
   rococo: {
@@ -110,7 +110,7 @@ export const MOVEMENTS = {
     en: 'Modernism',
     period: '20세기',
     icon: '🔮',
-    description: '입체·초현실·팝아트',
+    description: '전통을 부수는 실험',
     subtitle: '피카소 · 마그리트 · 샤갈'
   }
 };
@@ -146,6 +146,7 @@ export const MASTERS = {
     years: '1853~1890',
     movement: '후기인상주의',
     movementEn: 'Post-Impressionism',
+    tagline: '별과 소용돌이의 열정',
     icon: '🌻',
     description: '1853-1890 | 후기인상주의',
     aliases: ['van gogh', 'gogh', 'vincent', '고흐', '반 고흐'],
@@ -163,6 +164,7 @@ export const MASTERS = {
     years: '1862~1918',
     movement: '아르누보',
     movementEn: 'Art Nouveau',
+    tagline: '황금빛 사랑과 죽음',
     icon: '✨',
     description: '1862-1918 | 아르누보',
     aliases: ['gustav', 'gustav klimt', '클림트'],
@@ -180,6 +182,7 @@ export const MASTERS = {
     years: '1863~1944',
     movement: '표현주의',
     movementEn: 'Expressionism',
+    tagline: '내면의 고독과 불안',
     icon: '😱',
     description: '1863-1944 | 표현주의',
     aliases: ['edvard', 'edvard munch', '뭉크'],
@@ -197,6 +200,7 @@ export const MASTERS = {
     years: '1869~1954',
     movement: '야수파',
     movementEn: 'Fauvism',
+    tagline: '색채의 기쁨과 해방',
     icon: '🎭',
     description: '1869-1954 | 야수파',
     aliases: ['henri', 'henri matisse', '마티스'],
@@ -215,6 +219,7 @@ export const MASTERS = {
     years: '1887~1985',
     movement: '초현실주의',
     movementEn: 'Surrealism',
+    tagline: '사랑과 꿈의 비행',
     icon: '🎠',
     description: '1887-1985 | 초현실주의',
     aliases: ['marc', 'marc chagall', '샤갈', '마르크 샤갈'],
@@ -232,6 +237,7 @@ export const MASTERS = {
     years: '1907~1954',
     movement: '초현실주의',
     movementEn: 'Surrealism',
+    tagline: '고통 속 강인한 자아',
     icon: '🌺',
     description: '1907-1954 | 초현실주의',
     aliases: ['kahlo', 'frida kahlo', '프리다', '프리다 칼로'],
@@ -251,6 +257,7 @@ export const MASTERS = {
     years: '1881~1973',
     movement: '입체주의',
     movementEn: 'Cubism',
+    tagline: '형태를 해체한 혁명가',
     icon: '🎨',
     description: '1881-1973 | 입체주의',
     aliases: ['pablo', 'pablo picasso', '피카소'],
@@ -267,6 +274,7 @@ export const MASTERS = {
     years: '1923~1997',
     movement: '팝아트',
     movementEn: 'Pop Art',
+    tagline: '만화로 묻는 예술',
     icon: '💥',
     description: '1923-1997 | 팝아트',
     aliases: ['roy', 'roy lichtenstein', '리히텐슈타인', '로이 리히텐슈타인'],
@@ -287,7 +295,7 @@ export const ORIENTAL = {
     ko: '한국 전통회화',
     en: 'Korean Traditional Painting',
     icon: '🎎',
-    description: '여백의 미와 절제미',
+    description: '여백과 절제의 미',
     styles: {
       'minhwa': { 
         ko: '민화', 
@@ -311,7 +319,7 @@ export const ORIENTAL = {
     ko: '중국 전통회화',
     en: 'Chinese Traditional Painting',
     icon: '🐉',
-    description: '기운생동의 수묵화',
+    description: '붓과 먹의 철학',
     styles: {
       'gongbi': { 
         ko: '공필화', 
@@ -330,7 +338,7 @@ export const ORIENTAL = {
     ko: '일본 전통회화',
     en: 'Japanese Traditional Painting',
     icon: '🗾',
-    description: '섬세한 관찰과 대담한 생략',
+    description: '섬세한 관찰과 대담함',
     styles: {
       'ukiyoe': { 
         ko: '우키요에', 

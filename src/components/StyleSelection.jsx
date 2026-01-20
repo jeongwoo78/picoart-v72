@@ -32,16 +32,16 @@ const StyleSelection = ({ onSelect }) => {
   const artStyles = [
     // 미술사조 11개 (시간순) - category는 모두 'movements'로 통일
     { id: 'ancient', name: '그리스·로마', category: 'movements', icon: '🏛️', description: '완벽한 비례와 균형미' },
-    { id: 'medieval', name: '중세 미술', category: 'movements', icon: '⛪', description: '비잔틴·고딕·이슬람의 신성함' },
+    { id: 'medieval', name: '중세 미술', category: 'movements', icon: '⛪', description: '신을 향한 경건한 표현' },
     { id: 'renaissance', name: '르네상스', category: 'movements', icon: '🎭', description: '인간 중심의 이상적 아름다움' },
-    { id: 'baroque', name: '바로크', category: 'movements', icon: '👑', description: '극적이고 웅장한 표현' },
+    { id: 'baroque', name: '바로크', category: 'movements', icon: '👑', description: '빛과 어둠의 드라마' },
     { id: 'rococo', name: '로코코', category: 'movements', icon: '🌸', description: '우아하고 장식적인 취향' },
     { id: 'neoclassicism_vs_romanticism_vs_realism', name: '신고전 vs 낭만 vs 사실주의', category: 'movements', icon: '⚖️', description: '이성 vs 감성 vs 현실' },
     { id: 'impressionism', name: '인상주의', category: 'movements', icon: '🌅', description: '빛의 순간을 포착' },
     { id: 'postImpressionism', name: '후기인상주의', category: 'movements', icon: '🌻', description: '감정과 구조의 탐구' },
     { id: 'fauvism', name: '야수파', category: 'movements', icon: '🎨', description: '순수 색채의 해방' },
     { id: 'expressionism', name: '표현주의', category: 'movements', icon: '😱', description: '내면의 불안과 고독' },
-    { id: 'modernism', name: '20세기 모더니즘', category: 'movements', icon: '🔮', description: '입체·초현실·팝아트' },
+    { id: 'modernism', name: '20세기 모더니즘', category: 'movements', icon: '🔮', description: '전통을 부수는 실험' },
     
     // 거장 7명 (시간순: 출생연도) - v70: 피카소→샤갈
     { id: 'vangogh-master', name: '빈센트 반 고흐', nameEn: 'Vincent van Gogh', category: 'masters', icon: '🌻', description: '1853-1890 | 후기인상주의' },
@@ -53,9 +53,9 @@ const StyleSelection = ({ onSelect }) => {
     { id: 'lichtenstein-master', name: '로이 리히텐슈타인', nameEn: 'Roy Lichtenstein', category: 'masters', icon: '💥', description: '1923-1997 | 팝아트' },
     
     // 동양화
-    { id: 'korean', name: '한국 전통회화', nameEn: 'Korean Art', category: 'oriental', icon: '🎎', description: '여백의 미와 절제미' },
-    { id: 'chinese', name: '중국 전통회화', nameEn: 'Chinese Art', category: 'oriental', icon: '🐉', description: '기운생동의 수묵화' },
-    { id: 'japanese', name: '일본 전통회화', nameEn: 'Japanese Art', category: 'oriental', icon: '🗾', description: '섬세한 관찰과 대담한 생략' }
+    { id: 'korean', name: '한국 전통회화', nameEn: 'Korean Art', category: 'oriental', icon: '🎎', description: '여백과 절제의 미' },
+    { id: 'chinese', name: '중국 전통회화', nameEn: 'Chinese Art', category: 'oriental', icon: '🐉', description: '붓과 먹의 철학' },
+    { id: 'japanese', name: '일본 전통회화', nameEn: 'Japanese Art', category: 'oriental', icon: '🗾', description: '섬세한 관찰과 대담함' }
   ];
 
   // 대 카테고리 정의 (v51: 11개 사조)

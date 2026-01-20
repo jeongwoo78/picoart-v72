@@ -880,22 +880,23 @@ export function getOrientalDisplayInfo(artistName) {
 /**
  * 거장 표시 정보 (제목 + 부제)
  * @param {string} artistName - 거장명
- * @returns {{ fullName: string, movement: string }}
+ * @returns {{ fullName: string, movement: string, tagline: string }}
  */
 export function getMasterInfo(artistName) {
   const masterData = {
-    'vangogh': { fullName: '빈센트 반 고흐(Vincent van Gogh, 1853~1890)', movement: '후기인상주의(Post-Impressionism)' },
-    'klimt': { fullName: '구스타프 클림트(Gustav Klimt, 1862~1918)', movement: '아르누보(Art Nouveau)' },
-    'munch': { fullName: '에드바르 뭉크(Edvard Munch, 1863~1944)', movement: '표현주의(Expressionism)' },
-    'matisse': { fullName: '앙리 마티스(Henri Matisse, 1869~1954)', movement: '야수파(Fauvism)' },
-    'chagall': { fullName: '마르크 샤갈(Marc Chagall, 1887~1985)', movement: '초현실주의(Surrealism)' },
-    'frida': { fullName: '프리다 칼로(Frida Kahlo, 1907~1954)', movement: '초현실주의(Surrealism)' },
-    'lichtenstein': { fullName: '로이 리히텐슈타인(Roy Lichtenstein, 1923~1997)', movement: '팝아트(Pop Art)' }
+    'vangogh': { fullName: '빈센트 반 고흐(Vincent van Gogh, 1853~1890)', movement: '후기인상주의(Post-Impressionism)', tagline: '별과 소용돌이의 열정' },
+    'klimt': { fullName: '구스타프 클림트(Gustav Klimt, 1862~1918)', movement: '아르누보(Art Nouveau)', tagline: '황금빛 사랑과 죽음' },
+    'munch': { fullName: '에드바르 뭉크(Edvard Munch, 1863~1944)', movement: '표현주의(Expressionism)', tagline: '내면의 고독과 불안' },
+    'matisse': { fullName: '앙리 마티스(Henri Matisse, 1869~1954)', movement: '야수파(Fauvism)', tagline: '색채의 기쁨과 해방' },
+    'chagall': { fullName: '마르크 샤갈(Marc Chagall, 1887~1985)', movement: '초현실주의(Surrealism)', tagline: '사랑과 꿈의 비행' },
+    'frida': { fullName: '프리다 칼로(Frida Kahlo, 1907~1954)', movement: '초현실주의(Surrealism)', tagline: '고통 속 강인한 자아' },
+    'picasso': { fullName: '파블로 피카소(Pablo Picasso, 1881~1973)', movement: '입체주의(Cubism)', tagline: '형태를 해체한 혁명가' },
+    'lichtenstein': { fullName: '로이 리히텐슈타인(Roy Lichtenstein, 1923~1997)', movement: '팝아트(Pop Art)', tagline: '만화로 묻는 예술' }
   };
   
-  if (!artistName) return { fullName: '거장', movement: '' };
+  if (!artistName) return { fullName: '거장', movement: '', tagline: '' };
   const key = normalizeKey(artistName);
-  return masterData[key] || { fullName: artistName, movement: '' };
+  return masterData[key] || { fullName: artistName, movement: '', tagline: '' };
 }
 
 export default {

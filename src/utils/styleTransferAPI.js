@@ -108,7 +108,17 @@ const callFluxAPI = async (photoBase64, stylePrompt, onProgress) => {
 };
 
 const callFluxWithAI = async (photoBase64, selectedStyle, onProgress, correctionPrompt = null) => {
-  if (onProgress) onProgress('AI 자동 화가 선택 시작...');
+  // 카테고리별 메시지
+  if (onProgress) {
+    const category = selectedStyle?.category;
+    if (category === 'masters') {
+      onProgress('마스터 작업 중...');
+    } else if (category === 'oriental') {
+      onProgress('화풍 매칭 중...');
+    } else {
+      onProgress('화가 선택 중...');
+    }
+  }
 
   const requestBody = {
     image: photoBase64,

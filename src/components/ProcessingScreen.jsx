@@ -697,6 +697,11 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                       ? `${selectedStyle?.name}(${selectedStyle?.nameEn || 'Traditional Painting'})`
                       : (selectedStyle?.name || '스타일 변환')}
               </div>
+              {selectedStyle?.category === 'masters' ? (
+                <div className="preview-subtitle">{getMasterInfo(selectedStyle?.name).movement}</div>
+              ) : selectedStyle?.description && (
+                <div className="preview-subtitle">{selectedStyle.description}</div>
+              )}
             </div>
             {getSingleEducationContent(selectedStyle) && (
               <div className="edu-card primary">
