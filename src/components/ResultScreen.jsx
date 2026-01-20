@@ -1,6 +1,7 @@
 // PicoArt v72 - ResultScreen (스와이프 네비게이션)
 // v72: 원본+1차교육 ↔ 결과+2차교육 스와이프
 // v71: displayConfig.js 컨트롤 타워 사용
+// v73: 통합 스타일 표시 함수 사용
 
 import React, { useState, useEffect, useRef } from 'react';
 import BeforeAfter from './BeforeAfter';
@@ -17,11 +18,9 @@ import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/onec
 import { educationContent } from '../data/educationContent';
 import { saveToGallery } from './GalleryScreen';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
-// v71: displayConfig 컨트롤 타워
-import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo } from '../utils/displayConfig';
+// v73: displayConfig 통합 함수
+import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
-// v73: 제목/부제용 데이터
-import { MOVEMENTS, ORIENTAL } from '../data/masterData';
 
 
 const ResultScreen = ({ 
@@ -1908,11 +1907,17 @@ const ResultScreen = ({
 
         {/* 원클릭: viewIndex에 따라 원본/결과 표시 */}
         {/* v72: 원본 화면 - ProcessingScreen 카드형 레이아웃 */}
+        {/* v73: 통합 함수 사용 */}
         {isFullTransform && viewIndex === -1 && getPrimaryEducation() && (
           <div className="preview-card">
             <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
             <div className="preview-info">
-              <div className="preview-style">{selectedStyle?.name || '전체 변환'}</div>
+              <div className="preview-style">
+                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+              </div>
+              <div className="preview-subtitle">
+                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              </div>
             </div>
             <div className="edu-card primary">
               <p>{getPrimaryEducation().content}</p>
@@ -1927,11 +1932,17 @@ const ResultScreen = ({
 
         {/* 단일 변환: viewIndex에 따라 원본/결과 표시 */}
         {/* v72: 원본 화면 - ProcessingScreen 카드형 레이아웃 */}
+        {/* v73: 통합 함수 사용 */}
         {!isFullTransform && viewIndex === -1 && getPrimaryEducation() && (
           <div className="preview-card">
             <img src={URL.createObjectURL(originalPhoto)} alt="원본 사진" className="preview-image" />
             <div className="preview-info">
-              <div className="preview-style">{selectedStyle?.name}</div>
+              <div className="preview-style">
+                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
+              </div>
+              <div className="preview-subtitle">
+                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              </div>
             </div>
             <div className="edu-card primary">
               <p>{getPrimaryEducation().content || getPrimaryEducation().desc}</p>
@@ -1991,65 +2002,23 @@ const ResultScreen = ({
               </div>
               <div>
                 <h2>
-                  {/* v67: 새 표기 형식 - 제목 */}
-                  {/* 거장: 풀네임(영문, 생몰연도) */}
-                  {/* 미술사조: 사조(영문, 시기) */}
-                  {/* 동양화: 국가 전통회화(영문) */}
+                  {/* v73: 통합 함수 사용 */}
                   {(() => {
                     const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
                     const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
-                    
-                    if (category === 'masters') {
-                      // API 실패 시 selectedStyle.name 사용
-                      const artistForDisplay = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
-                      const masterInfo = getMasterInfo(artistForDisplay);
-                      return masterInfo.fullName;
-                    } else if (category === 'movements') {
-                      // v73: MOVEMENTS에서 직접 가져오기
-                      const m = MOVEMENTS[styleId];
-                      return m ? `${m.ko}(${m.en}, ${m.period})` : '미술사조';
-                    } else if (category === 'oriental') {
-                      // v73: ORIENTAL에서 직접 가져오기
-                      const o = ORIENTAL[styleId];
-                      return o ? `${o.ko}(${o.en})` : '동양화';
-                    }
-                    return selectedStyle?.name || '스타일';
+                    const artistName = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
+                    return getStyleTitle(category, styleId, artistName);
                   })()}
                 </h2>
                 <p className="technique-subtitle">
                   <span className="artist-name">
-                    {/* v73: 원클릭/단독 분기 */}
-                    {/* 원클릭: 사조=description, 거장=tagline, 동양화=description */}
-                    {/* 단독: 사조=화가명, 거장=tagline, 동양화=스타일명 */}
+                    {/* v73: 통합 함수 사용 */}
                     {(() => {
                       const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
                       const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
-                      const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
-                      
-                      if (category === 'masters') {
-                        const artistForDisplay = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
-                        const masterInfo = getMasterInfo(artistForDisplay);
-                        return masterInfo.tagline || '거장';
-                      } else if (category === 'movements') {
-                        if (isFullTransform) {
-                          // 원클릭: MOVEMENTS에서 description 가져오기
-                          return MOVEMENTS[styleId]?.description || '서양미술사';
-                        } else {
-                          // 단독: 화가명
-                          const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
-                          return movementInfo.subtitle;
-                        }
-                      } else if (category === 'oriental') {
-                        if (isFullTransform) {
-                          // 원클릭: ORIENTAL에서 description 가져오기
-                          return ORIENTAL[styleId]?.description || '동양화';
-                        } else {
-                          // 단독: 스타일명 (AI가 선택한 스타일)
-                          const orientalInfo = getOrientalDisplayInfo(displayArtist);
-                          return orientalInfo.subtitle;
-                        }
-                      }
-                      return formatArtistName(displayArtist);
+                      const artistName = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
+                      const mode = isFullTransform ? 'result-oneclick' : 'result-single';
+                      return getStyleSubtitle(category, styleId, mode, displayArtist, artistName);
                     })()}
                   </span>
                 </p>
@@ -2722,6 +2691,11 @@ const ResultScreen = ({
           color: #333;
           margin-bottom: 6px;
           line-height: 1.3;
+        }
+        .preview-card .preview-subtitle {
+          font-size: 0.95rem;
+          color: #666;
+          font-weight: 500;
         }
         .preview-card .edu-card {
           padding: 16px;

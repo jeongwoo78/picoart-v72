@@ -865,12 +865,12 @@ export function getMovementDisplayInfo(styleName, artistName) {
  */
 export function getOrientalDisplayInfo(artistName) {
   const orientalData = {
-    'korean-minhwa': { title: '한국 전통회화(Korean Traditional Painting)', subtitle: '민화(Minhwa)' },
-    'korean-pungsokdo': { title: '한국 전통회화(Korean Traditional Painting)', subtitle: '풍속도(Pungsokdo)' },
-    'korean-jingyeong': { title: '한국 전통회화(Korean Traditional Painting)', subtitle: '진경산수화(Jingyeong)' },
-    'chinese-ink': { title: '중국 전통회화(Chinese Traditional Painting)', subtitle: '수묵화(Ink Wash)' },
-    'chinese-gongbi': { title: '중국 전통회화(Chinese Traditional Painting)', subtitle: '공필화(Gongbi)' },
-    'japanese-ukiyoe': { title: '일본 전통회화(Japanese Traditional Painting)', subtitle: '우키요에(Ukiyo-e)' }
+    'korean-minhwa': { title: '한국 전통회화(Korean Traditional Art)', subtitle: '민화(Minhwa)' },
+    'korean-pungsokdo': { title: '한국 전통회화(Korean Traditional Art)', subtitle: '풍속도(Pungsokdo)' },
+    'korean-jingyeong': { title: '한국 전통회화(Korean Traditional Art)', subtitle: '진경산수화(Jingyeong)' },
+    'chinese-ink': { title: '중국 전통회화(Chinese Traditional Art)', subtitle: '수묵화(Ink Wash)' },
+    'chinese-gongbi': { title: '중국 전통회화(Chinese Traditional Art)', subtitle: '공필화(Gongbi)' },
+    'japanese-ukiyoe': { title: '일본 전통회화(Japanese Traditional Art)', subtitle: '우키요에(Ukiyo-e)' }
   };
   
   const key = normalizeKey(artistName);
@@ -899,6 +899,96 @@ export function getMasterInfo(artistName) {
   return masterData[key] || { fullName: artistName, movement: '', tagline: '' };
 }
 
+// ========== v73: 통합 스타일 표시 함수 ==========
+import { MOVEMENTS, ORIENTAL, MASTERS } from '../data/masterData';
+
+/**
+ * 스타일 아이콘 가져오기
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} styleId - 스타일 ID
+ * @param {string} artistName - 거장 이름 (masters일 때)
+ * @returns {string} 이모지
+ */
+export function getStyleIcon(category, styleId, artistName) {
+  if (category === 'masters') {
+    const key = normalizeKey(artistName || styleId);
+    for (const [id, value] of Object.entries(MASTERS)) {
+      if (value.key === key || id.includes(key)) {
+        return value.icon;
+      }
+    }
+    return '🎨';
+  } else if (category === 'movements') {
+    return MOVEMENTS[styleId]?.icon || '🎨';
+  } else if (category === 'oriental') {
+    return ORIENTAL[styleId]?.icon || '🎎';
+  }
+  return '🎨';
+}
+
+/**
+ * 스타일 제목 가져오기
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} styleId - 스타일 ID
+ * @param {string} artistName - 거장 이름 (masters일 때)
+ * @returns {string} 제목
+ */
+export function getStyleTitle(category, styleId, artistName) {
+  if (category === 'masters') {
+    const masterInfo = getMasterInfo(artistName || styleId);
+    return masterInfo.fullName;
+  } else if (category === 'movements') {
+    const m = MOVEMENTS[styleId];
+    return m ? `${m.ko}(${m.en}, ${m.period})` : '미술사조';
+  } else if (category === 'oriental') {
+    const o = ORIENTAL[styleId];
+    return o ? `${o.ko}(${o.en})` : '동양화';
+  }
+  return '스타일';
+}
+
+/**
+ * 스타일 부제 가져오기
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} styleId - 스타일 ID
+ * @param {string} mode - 'loading' | 'result-oneclick' | 'result-single'
+ * @param {string} displayArtist - AI가 선택한 화가/스타일
+ * @param {string} artistName - 거장 이름 (masters일 때)
+ * @returns {string} 부제
+ */
+export function getStyleSubtitle(category, styleId, mode, displayArtist, artistName) {
+  if (category === 'masters') {
+    if (mode === 'loading') {
+      // 변환 중: 사조(영문)
+      const masterInfo = getMasterInfo(artistName || styleId);
+      return masterInfo.movement;
+    } else {
+      // 결과: tagline
+      const masterInfo = getMasterInfo(artistName || styleId);
+      return masterInfo.tagline || '거장';
+    }
+  } else if (category === 'movements') {
+    if (mode === 'loading' || mode === 'result-oneclick') {
+      // 변환 중 / 원클릭 결과: description
+      return MOVEMENTS[styleId]?.description || '서양미술사';
+    } else {
+      // 단독 결과: 화가명
+      const movementInfo = getMovementDisplayInfo(styleId, displayArtist);
+      return movementInfo.subtitle;
+    }
+  } else if (category === 'oriental') {
+    if (mode === 'loading' || mode === 'result-oneclick') {
+      // 변환 중 / 원클릭 결과: description
+      return ORIENTAL[styleId]?.description || '동양화';
+    } else {
+      // 단독 결과: 스타일명
+      const orientalInfo = getOrientalDisplayInfo(displayArtist);
+      return orientalInfo.subtitle;
+    }
+  }
+  return '';
+}
+
 export default {
   STANDARD_KEYS,
   ALIASES,
@@ -911,5 +1001,8 @@ export default {
   detectCategory,
   getMovementDisplayInfo,
   getOrientalDisplayInfo,
-  getMasterInfo
+  getMasterInfo,
+  getStyleIcon,
+  getStyleTitle,
+  getStyleSubtitle
 };

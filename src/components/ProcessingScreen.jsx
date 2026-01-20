@@ -1,6 +1,7 @@
 // PicoArt v71 - ProcessingScreen (displayConfig 기반)
 // 원칙: 단일 변환 로직만 있고, 원클릭은 그걸 N번 반복
 // v71: displayConfig.js 컨트롤 타워 사용
+// v73: 통합 스타일 표시 함수 사용
 import React, { useEffect, useState } from 'react';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 import { educationContent } from '../data/educationContent';
@@ -8,11 +9,9 @@ import { educationContent } from '../data/educationContent';
 import { oneclickMovementsPrimary, oneclickMovementsSecondary } from '../data/oneclickMovementsEducation';
 import { oneclickMastersPrimary, oneclickMastersSecondary } from '../data/oneclickMastersEducation';
 import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
-// v71: displayConfig 컨트롤 타워
-import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo } from '../utils/displayConfig';
+// v73: displayConfig 통합 함수
+import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
-// v73: 부제용 데이터
-import { MOVEMENTS, ORIENTAL } from '../data/masterData';
 
 const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   const [statusText, setStatusText] = useState('준비 중...');
@@ -691,21 +690,11 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
             <img src={URL.createObjectURL(photo)} alt="원본 사진" />
             <div className="preview-info">
               <div className="preview-style">
-                {selectedStyle?.category === 'masters' 
-                  ? getMasterInfo(selectedStyle?.name).fullName 
-                  : selectedStyle?.category === 'movements'
-                    ? `${MOVEMENTS[selectedStyle?.id]?.ko}(${MOVEMENTS[selectedStyle?.id]?.en}, ${MOVEMENTS[selectedStyle?.id]?.period})`
-                    : selectedStyle?.category === 'oriental'
-                      ? `${ORIENTAL[selectedStyle?.id]?.ko}(${ORIENTAL[selectedStyle?.id]?.en})`
-                      : (selectedStyle?.name || '스타일 변환')}
+                {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
               </div>
-              {selectedStyle?.category === 'masters' ? (
-                <div className="preview-subtitle">{getMasterInfo(selectedStyle?.name).movement}</div>
-              ) : selectedStyle?.category === 'movements' ? (
-                <div className="preview-subtitle">{MOVEMENTS[selectedStyle?.id]?.description}</div>
-              ) : selectedStyle?.category === 'oriental' ? (
-                <div className="preview-subtitle">{ORIENTAL[selectedStyle?.id]?.description}</div>
-              ) : null}
+              <div className="preview-subtitle">
+                {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
+              </div>
             </div>
             {getSingleEducationContent(selectedStyle) && (
               <div className="edu-card primary">
