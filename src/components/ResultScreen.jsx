@@ -2060,7 +2060,6 @@ const ResultScreen = ({
                 </div>
               ) : (
                 <div className="technique-explanation">
-                  <h3>🖌️ 적용된 예술 기법</h3>
                   {educationText.split('\n\n').map((paragraph, index) => (
                     paragraph.trim() && (
                       <p key={index}>

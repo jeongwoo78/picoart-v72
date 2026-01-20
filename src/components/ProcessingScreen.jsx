@@ -700,7 +700,6 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
             </div>
             {getSingleEducationContent(selectedStyle) && (
               <div className="edu-card primary">
-                <h3>{getSingleEducationContent(selectedStyle).title}</h3>
                 <p>{getSingleEducationContent(selectedStyle).desc}</p>
               </div>
             )}
