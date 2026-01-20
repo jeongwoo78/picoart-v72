@@ -109,10 +109,10 @@ const StyleSelection = ({ onSelect }) => {
     
     // 미술사조(movements)인 경우 바로 선택
     if (mainCategory === 'movements') {
-      const categoryStyles = groupedStyles[categoryKey]?.styles || [];
-      if (categoryStyles.length > 0) {
-        // 해당 카테고리의 첫 번째 스타일을 대표로 선택
-        onSelect(categoryStyles[0]);
+      // artStyles에서 해당 id를 가진 스타일 찾기
+      const style = artStyles.find(s => s.id === categoryKey);
+      if (style) {
+        onSelect(style);
       }
     }
   };

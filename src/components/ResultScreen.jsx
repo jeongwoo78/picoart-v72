@@ -2006,8 +2006,9 @@ const ResultScreen = ({
                       const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
                       return movementInfo.title;
                     } else if (category === 'oriental') {
-                      const orientalInfo = getOrientalDisplayInfo(displayArtist);
-                      return orientalInfo.title;
+                      // 동양화: style 정보에서 직접 가져오기
+                      const styleData = isFullTransform ? currentResult?.style : selectedStyle;
+                      return `${styleData?.name}(${styleData?.nameEn || 'Traditional Painting'})`;
                     }
                     return styleName;
                   })()}
@@ -2039,7 +2040,7 @@ const ResultScreen = ({
                           // 원클릭: description 사용
                           return currentResult?.style?.description || '동양화';
                         } else {
-                          // 단독: 스타일명
+                          // 단독: 스타일명 (AI가 선택한 스타일)
                           const orientalInfo = getOrientalDisplayInfo(displayArtist);
                           return orientalInfo.subtitle;
                         }
