@@ -11,6 +11,8 @@ import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/onec
 // v71: displayConfig 컨트롤 타워
 import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
+// v73: 부제용 데이터
+import { MOVEMENTS, ORIENTAL } from '../data/masterData';
 
 const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
   const [statusText, setStatusText] = useState('준비 중...');
@@ -692,16 +694,18 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                 {selectedStyle?.category === 'masters' 
                   ? getMasterInfo(selectedStyle?.name).fullName 
                   : selectedStyle?.category === 'movements'
-                    ? getMovementDisplayInfo(selectedStyle?.name, null).title
+                    ? `${MOVEMENTS[selectedStyle?.id]?.ko}(${MOVEMENTS[selectedStyle?.id]?.en}, ${MOVEMENTS[selectedStyle?.id]?.period})`
                     : selectedStyle?.category === 'oriental'
-                      ? `${selectedStyle?.name}(${selectedStyle?.nameEn || 'Traditional Art'})`
+                      ? `${ORIENTAL[selectedStyle?.id]?.ko}(${ORIENTAL[selectedStyle?.id]?.en})`
                       : (selectedStyle?.name || '스타일 변환')}
               </div>
               {selectedStyle?.category === 'masters' ? (
                 <div className="preview-subtitle">{getMasterInfo(selectedStyle?.name).movement}</div>
-              ) : selectedStyle?.description && (
-                <div className="preview-subtitle">{selectedStyle.description}</div>
-              )}
+              ) : selectedStyle?.category === 'movements' ? (
+                <div className="preview-subtitle">{MOVEMENTS[selectedStyle?.id]?.description}</div>
+              ) : selectedStyle?.category === 'oriental' ? (
+                <div className="preview-subtitle">{ORIENTAL[selectedStyle?.id]?.description}</div>
+              ) : null}
             </div>
             {getSingleEducationContent(selectedStyle) && (
               <div className="edu-card primary">

@@ -20,6 +20,8 @@ import { processStyleTransfer } from '../utils/styleTransferAPI';
 // v71: displayConfig 컨트롤 타워
 import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
+// v73: 제목/부제용 데이터
+import { MOVEMENTS, ORIENTAL } from '../data/masterData';
 
 
 const ResultScreen = ({ 
@@ -1992,10 +1994,10 @@ const ResultScreen = ({
                   {/* v67: 새 표기 형식 - 제목 */}
                   {/* 거장: 풀네임(영문, 생몰연도) */}
                   {/* 미술사조: 사조(영문, 시기) */}
-                  {/* 동양화: 국가 전통회화 */}
+                  {/* 동양화: 국가 전통회화(영문) */}
                   {(() => {
                     const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
-                    const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
+                    const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
                     
                     if (category === 'masters') {
                       // API 실패 시 selectedStyle.name 사용
@@ -2003,14 +2005,15 @@ const ResultScreen = ({
                       const masterInfo = getMasterInfo(artistForDisplay);
                       return masterInfo.fullName;
                     } else if (category === 'movements') {
-                      const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
-                      return movementInfo.title;
+                      // v73: MOVEMENTS에서 직접 가져오기
+                      const m = MOVEMENTS[styleId];
+                      return m ? `${m.ko}(${m.en}, ${m.period})` : '미술사조';
                     } else if (category === 'oriental') {
-                      // 동양화: style 정보에서 직접 가져오기
-                      const styleData = isFullTransform ? currentResult?.style : selectedStyle;
-                      return `${styleData?.name}(${styleData?.nameEn || 'Traditional Painting'})`;
+                      // v73: ORIENTAL에서 직접 가져오기
+                      const o = ORIENTAL[styleId];
+                      return o ? `${o.ko}(${o.en})` : '동양화';
                     }
-                    return styleName;
+                    return selectedStyle?.name || '스타일';
                   })()}
                 </h2>
                 <p className="technique-subtitle">
@@ -2020,6 +2023,7 @@ const ResultScreen = ({
                     {/* 단독: 사조=화가명, 거장=tagline, 동양화=스타일명 */}
                     {(() => {
                       const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
+                      const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
                       const styleName = isFullTransform ? (currentResult?.style?.name || selectedStyle.name) : selectedStyle.name;
                       
                       if (category === 'masters') {
@@ -2028,8 +2032,8 @@ const ResultScreen = ({
                         return masterInfo.tagline || '거장';
                       } else if (category === 'movements') {
                         if (isFullTransform) {
-                          // 원클릭: description 사용
-                          return currentResult?.style?.description || '서양미술사';
+                          // 원클릭: MOVEMENTS에서 description 가져오기
+                          return MOVEMENTS[styleId]?.description || '서양미술사';
                         } else {
                           // 단독: 화가명
                           const movementInfo = getMovementDisplayInfo(styleName, displayArtist);
@@ -2037,8 +2041,8 @@ const ResultScreen = ({
                         }
                       } else if (category === 'oriental') {
                         if (isFullTransform) {
-                          // 원클릭: description 사용
-                          return currentResult?.style?.description || '동양화';
+                          // 원클릭: ORIENTAL에서 description 가져오기
+                          return ORIENTAL[styleId]?.description || '동양화';
                         } else {
                           // 단독: 스타일명 (AI가 선택한 스타일)
                           const orientalInfo = getOrientalDisplayInfo(displayArtist);
