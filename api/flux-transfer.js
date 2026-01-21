@@ -2430,7 +2430,7 @@ function buildIdentityPrompt(visionAnalysis) {
     } else {
       parts.push('strong angular jaw, male bone structure, masculine build');
     }
-    parts.push('DO NOT feminize, DO NOT soften features, KEEP AS MAN');
+    parts.push('MUST KEEP MASCULINE, MUST KEEP STRONG ANGULAR FEATURES, MUST REMAIN MALE');
   } else if (visionAnalysis.gender === 'female') {
     parts.push('FEMALE SUBJECT with FEMININE features');
     if (visionAnalysis.physical_description) {
@@ -2438,7 +2438,7 @@ function buildIdentityPrompt(visionAnalysis) {
     } else {
       parts.push('soft delicate features, female bone structure, feminine build');
     }
-    parts.push('DO NOT masculinize, KEEP AS WOMAN');
+    parts.push('MUST KEEP FEMININE, MUST KEEP SOFT DELICATE FEATURES, MUST REMAIN FEMALE');
   } else if (visionAnalysis.gender === 'both') {
     // 남녀 혼합 (커플, 그룹 등)
     parts.push('MIXED GENDER GROUP - PRESERVE BOTH GENDERS EXACTLY');
@@ -2447,7 +2447,7 @@ function buildIdentityPrompt(visionAnalysis) {
     }
     parts.push('MALE figures MUST remain MASCULINE with strong jaw and male bone structure');
     parts.push('FEMALE figures MUST remain FEMININE with soft features and female bone structure');
-    parts.push('DO NOT swap genders, DO NOT feminize males, DO NOT masculinize females');
+    parts.push('MALES MUST STAY MASCULINE, FEMALES MUST STAY FEMININE, PRESERVE EACH GENDER EXACTLY');
   }
   
   // 나이
@@ -2472,16 +2472,16 @@ function buildIdentityPrompt(visionAnalysis) {
   // 민족성 (매우 중요!)
   if (visionAnalysis.ethnicity) {
     const ethnicityMap = {
-      'asian': 'ASIAN ethnicity with East Asian facial features, monolid or double eyelid eyes, warm golden-brown skin tone',
-      'caucasian': 'CAUCASIAN ethnicity with European facial features, light skin tone',
-      'african': 'AFRICAN ethnicity with African facial features, dark brown skin tone',
-      'hispanic': 'HISPANIC/LATINO ethnicity with Latin American features, warm tan skin tone',
-      'middle_eastern': 'MIDDLE EASTERN ethnicity with Middle Eastern features, olive skin tone',
-      'mixed': 'MIXED ethnicity preserving original mixed heritage features'
+      'asian': 'ASIAN PERSON with East Asian facial bone structure, monolid or double eyelid eyes, warm golden-brown skin tone, dark brown eyes, straight black hair',
+      'caucasian': 'CAUCASIAN PERSON with European facial bone structure, light fair skin tone, defined nose bridge, varied eye colors',
+      'african': 'BLACK AFRICAN PERSON with DARK BROWN TO BLACK SKIN, African facial bone structure, broad nose, full lips, dark brown eyes, natural African hair texture',
+      'hispanic': 'HISPANIC/LATINO PERSON with Latin American features, warm tan to brown skin tone, dark eyes, dark hair, mestizo bone structure',
+      'middle_eastern': 'MIDDLE EASTERN/ARAB PERSON with olive to tan skin tone, Middle Eastern facial bone structure, dark eyes, dark hair, prominent nose bridge',
+      'mixed': 'MIXED ETHNICITY PERSON preserving original mixed heritage features, exact same skin tone as original'
     };
     const ethnicDesc = ethnicityMap[visionAnalysis.ethnicity] || `${visionAnalysis.ethnicity} ethnicity`;
     parts.push(ethnicDesc);
-    parts.push('DO NOT change race, DO NOT alter skin color, PRESERVE original ethnicity EXACTLY');
+    parts.push('MUST KEEP EXACT SAME SKIN COLOR AND TONE, MUST PRESERVE ALL RACIAL FEATURES');
   }
   
   return parts.join(', ');
