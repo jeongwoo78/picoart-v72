@@ -1921,7 +1921,7 @@ Return ONLY valid JSON (no markdown):
   "subject_type": "person" or "landscape" or "animal" or "object",
   "gender": "male" or "female" or "both" or null,
   "age_range": "baby/child/teen/young_adult/adult/middle_aged/elderly" or null,
-  "ethnicity": "asian" or "caucasian" or "african" or "hispanic" or "middle_eastern" or "mixed" or null,
+  "ethnicity": "asian (East Asian features, golden-brown skin) or caucasian (European features, light/fair skin) or african (Black/African descent, DARK BROWN to BLACK skin, broad nose, full lips) or hispanic (Latin American, tan/brown skin) or middle_eastern (Arab/Persian, olive/tan skin) or mixed or null - MUST accurately identify based on skin color and facial features",
   "physical_description": "for MALE: strong jaw, angular face, short hair, broad shoulders etc. For FEMALE: soft features, delicate face etc. ALWAYS include skin tone and ethnic features." or null,
   "person_count": 1 or 2 or 3 (number of people in photo),
   "background_type": "simple" or "complex" or "outdoor" or "indoor" or "studio",
@@ -1966,7 +1966,7 @@ Return ONLY valid JSON (no markdown):
   "subject_type": "person" or "landscape" or "animal" or "object",
   "gender": "male" or "female" or "both" or null,
   "age_range": "baby/child/teen/young_adult/adult/middle_aged/elderly" or null,
-  "ethnicity": "asian" or "caucasian" or "african" or "hispanic" or "middle_eastern" or "mixed" or null,
+  "ethnicity": "asian (East Asian features, golden-brown skin) or caucasian (European features, light/fair skin) or african (Black/African descent, DARK BROWN to BLACK skin, broad nose, full lips) or hispanic (Latin American, tan/brown skin) or middle_eastern (Arab/Persian, olive/tan skin) or mixed or null - MUST accurately identify based on skin color and facial features",
   "physical_description": "for MALE: strong jaw, angular face, short hair, broad shoulders etc. For FEMALE: soft features, delicate face etc. ALWAYS include skin tone and ethnic features." or null,
   "person_count": 1 or 2 or 3,
   "background_type": "simple" or "complex" or "outdoor" or "indoor" or "studio",
@@ -2323,7 +2323,7 @@ Return JSON only:
   "subject_type": "person" or "landscape" or "animal" or "object",
   "gender": "male" or "female" or "both" or null,
   "age_range": "baby/child/teen/young_adult/adult/middle_aged/elderly" or null,
-  "ethnicity": "asian" or "caucasian" or "african" or "hispanic" or "middle_eastern" or "mixed" or null,
+  "ethnicity": "asian (East Asian features, golden-brown skin) or caucasian (European features, light/fair skin) or african (Black/African descent, DARK BROWN to BLACK skin, broad nose, full lips) or hispanic (Latin American, tan/brown skin) or middle_eastern (Arab/Persian, olive/tan skin) or mixed or null - MUST accurately identify based on skin color and facial features",
   "physical_description": "for MALE: strong jaw, angular face, short hair, broad shoulders etc. For FEMALE: soft features, delicate face etc. ALWAYS include skin tone and ethnic features." or null,
   "person_count": 1 or 2 or 3 (number of people in photo),
   "background_type": "simple" or "complex" or "outdoor" or "indoor" or "studio",
@@ -3737,6 +3737,28 @@ export default async function handler(req, res) {
       const attractiveEnhancement = ' Render stunningly beautiful - male as handsome, dignified; female as gorgeous, elegant, graceful. Idealized flattering portrait.';
       finalPrompt = finalPrompt + attractiveEnhancement;
       logData.prompt.applied.attractive = true;
+    }
+    
+    // ========================================
+    // v72.1: 인종 보존 강화 (프롬프트 맨 앞에 삽입)
+    // African/Middle Eastern일 때 피부색 강력 강조
+    // ========================================
+    if (visionAnalysis && visionAnalysis.ethnicity) {
+      const ethnicity = visionAnalysis.ethnicity.toLowerCase();
+      if (ethnicity === 'african') {
+        // 1번: 맨 앞으로 + 2번: 반복 강조
+        finalPrompt = 'CRITICAL REQUIREMENT: BLACK PERSON WITH DARK BROWN TO BLACK SKIN COLOR THROUGHOUT ENTIRE IMAGE. SKIN MUST REMAIN DARK. ' + finalPrompt + ' DARK BROWN BLACK SKIN PRESERVED.';
+        logData.prompt.applied.ethnicityBoost = 'african';
+      } else if (ethnicity === 'middle_eastern') {
+        finalPrompt = 'CRITICAL REQUIREMENT: MIDDLE EASTERN PERSON WITH OLIVE TO TAN SKIN COLOR. ' + finalPrompt + ' OLIVE TAN SKIN PRESERVED.';
+        logData.prompt.applied.ethnicityBoost = 'middle_eastern';
+      } else if (ethnicity === 'hispanic') {
+        finalPrompt = 'CRITICAL REQUIREMENT: HISPANIC LATINO PERSON WITH WARM TAN BROWN SKIN COLOR. ' + finalPrompt + ' TAN BROWN SKIN PRESERVED.';
+        logData.prompt.applied.ethnicityBoost = 'hispanic';
+      } else if (ethnicity === 'asian') {
+        finalPrompt = 'CRITICAL REQUIREMENT: ASIAN PERSON WITH WARM GOLDEN BROWN SKIN TONE. ' + finalPrompt + ' ASIAN SKIN TONE PRESERVED.';
+        logData.prompt.applied.ethnicityBoost = 'asian';
+      }
     }
     
     // ========================================
