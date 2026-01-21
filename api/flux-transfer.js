@@ -2629,6 +2629,9 @@ export default async function handler(req, res) {
     // v68.3: 변수 초기화 (스코프 문제 해결) - v68: 긍정 명령어로 통일
     let coreRulesPrefix = 'Female nipples MUST be covered by clothing. Preserve identity, gender, ethnicity exactly. Keep only original elements from photo. Clean artwork, text-free, signature-free, watermark-free. ';
     let genderPrefixCommon = '';
+    
+    // v72.1: photoAnalysis 초기화 (인종 보존용)
+    let photoAnalysis = { ethnicity: null };
 
     // v66: 구조화된 로그 수집 객체
     const logData = {
@@ -2941,13 +2944,14 @@ export default async function handler(req, res) {
       // 🎯 대전제: 가중치 기반 화가 사전 선택
       // ========================================
       let preSelectedArtist = null;
-      const photoAnalysis = {}; // AI가 분석하기 전 기본 분석
+      photoAnalysis = {}; // AI가 분석하기 전 기본 분석 (v72.1: let 재사용)
       
       // Vision 분석 결과를 photoAnalysis에 반영
       if (visionAnalysis) {
         photoAnalysis.gender = visionAnalysis.gender;
         photoAnalysis.age_range = visionAnalysis.age_range;
         photoAnalysis.count = visionAnalysis.person_count || 0;
+        photoAnalysis.ethnicity = visionAnalysis.ethnicity;  // v72.1: 인종 정보 추가
       }
       
       // 이미지에서 기본 정보 추출 시도 (카테고리별 가중치 테이블이 있는 경우)
@@ -3743,20 +3747,20 @@ export default async function handler(req, res) {
     // v72.1: 인종 보존 강화 (프롬프트 맨 앞에 삽입)
     // African/Middle Eastern일 때 피부색 강력 강조
     // ========================================
-    if (visionAnalysis && visionAnalysis.ethnicity) {
-      const ethnicity = visionAnalysis.ethnicity.toLowerCase();
+    if (photoAnalysis && photoAnalysis.ethnicity) {
+      const ethnicity = photoAnalysis.ethnicity.toLowerCase();
       if (ethnicity === 'african') {
         // 1번: 맨 앞으로 + 2번: 반복 강조
-        finalPrompt = 'CRITICAL REQUIREMENT: BLACK PERSON WITH DARK BROWN TO BLACK SKIN COLOR THROUGHOUT ENTIRE IMAGE. SKIN MUST REMAIN DARK. ' + finalPrompt + ' DARK BROWN BLACK SKIN PRESERVED.';
+        finalPrompt = 'CRITICAL: BLACK PERSON DARK SKIN. ' + finalPrompt + ' DARK SKIN.';
         logData.prompt.applied.ethnicityBoost = 'african';
       } else if (ethnicity === 'middle_eastern') {
-        finalPrompt = 'CRITICAL REQUIREMENT: MIDDLE EASTERN PERSON WITH OLIVE TO TAN SKIN COLOR. ' + finalPrompt + ' OLIVE TAN SKIN PRESERVED.';
+        finalPrompt = 'CRITICAL: ARAB PERSON OLIVE TAN SKIN. ' + finalPrompt + ' OLIVE SKIN.';
         logData.prompt.applied.ethnicityBoost = 'middle_eastern';
       } else if (ethnicity === 'hispanic') {
-        finalPrompt = 'CRITICAL REQUIREMENT: HISPANIC LATINO PERSON WITH WARM TAN BROWN SKIN COLOR. ' + finalPrompt + ' TAN BROWN SKIN PRESERVED.';
+        finalPrompt = 'CRITICAL: LATINO PERSON TAN SKIN. ' + finalPrompt + ' TAN SKIN.';
         logData.prompt.applied.ethnicityBoost = 'hispanic';
       } else if (ethnicity === 'asian') {
-        finalPrompt = 'CRITICAL REQUIREMENT: ASIAN PERSON WITH WARM GOLDEN BROWN SKIN TONE. ' + finalPrompt + ' ASIAN SKIN TONE PRESERVED.';
+        finalPrompt = 'CRITICAL: ASIAN PERSON GOLDEN SKIN. ' + finalPrompt + ' ASIAN SKIN.';
         logData.prompt.applied.ethnicityBoost = 'asian';
       }
     }
