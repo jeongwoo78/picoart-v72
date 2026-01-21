@@ -149,6 +149,7 @@ export const MASTERS = {
     tagline: '별과 소용돌이의 열정',
     icon: '🌻',
     description: '1853-1890 | 후기인상주의',
+    featuredWorks: '별이 빛나는 밤 · 해바라기',
     aliases: ['van gogh', 'gogh', 'vincent', '고흐', '반 고흐'],
     works: {
       'starrynight': ['The Starry Night', '별이 빛나는 밤', 'Starry Night'],
@@ -167,6 +168,7 @@ export const MASTERS = {
     tagline: '황금빛 사랑과 죽음',
     icon: '✨',
     description: '1862-1918 | 아르누보',
+    featuredWorks: '키스 · 생명의 나무',
     aliases: ['gustav', 'gustav klimt', '클림트'],
     works: {
       'kiss': ['The Kiss', '키스', 'Kiss'],
@@ -185,6 +187,7 @@ export const MASTERS = {
     tagline: '내면의 고독과 불안',
     icon: '😱',
     description: '1863-1944 | 표현주의',
+    featuredWorks: '절규 · 마돈나',
     aliases: ['edvard', 'edvard munch', '뭉크'],
     works: {
       'scream': ['The Scream', '절규', 'Scream'],
@@ -203,6 +206,7 @@ export const MASTERS = {
     tagline: '색채의 기쁨과 해방',
     icon: '🎭',
     description: '1869-1954 | 야수파',
+    featuredWorks: '춤 · 붉은 방',
     aliases: ['henri', 'henri matisse', '마티스'],
     works: {
       'dance': ['The Dance', '춤', 'Dance', 'La Danse'],
@@ -222,6 +226,7 @@ export const MASTERS = {
     tagline: '사랑과 꿈의 비행',
     icon: '🎠',
     description: '1887-1985 | 초현실주의',
+    featuredWorks: '나와 마을 · 산책',
     aliases: ['marc', 'marc chagall', '샤갈', '마르크 샤갈'],
     works: {
       'lovers': ['Lovers with Flowers', '꽃다발과 연인들', 'Lovers'],
@@ -240,6 +245,7 @@ export const MASTERS = {
     tagline: '고통 속 강인한 자아',
     icon: '🌺',
     description: '1907-1954 | 초현실주의',
+    featuredWorks: '부러진 기둥 · 가시 목걸이와 벌새',
     aliases: ['kahlo', 'frida kahlo', '프리다', '프리다 칼로'],
     works: {
       'parrots': ['Me and My Parrots', '나와 내 앵무새들', 'Self-Portrait with Parrots'],
@@ -260,6 +266,7 @@ export const MASTERS = {
     tagline: '형태를 해체한 혁명가',
     icon: '🎨',
     description: '1881-1973 | 입체주의',
+    featuredWorks: '아비뇽의 처녀들 · 게르니카',
     aliases: ['pablo', 'pablo picasso', '피카소'],
     works: {
       'demoiselles': ["Les Demoiselles d'Avignon", '아비뇽의 처녀들', 'Demoiselles', "Demoiselles d'Avignon"],
@@ -277,6 +284,7 @@ export const MASTERS = {
     tagline: '만화로 묻는 예술',
     icon: '💥',
     description: '1923-1997 | 팝아트',
+    featuredWorks: '행복한 눈물 · 익사하는 소녀',
     aliases: ['roy', 'roy lichtenstein', '리히텐슈타인', '로이 리히텐슈타인'],
     works: {
       'inthecar': ['In the Car', '차 안에서', 'In Car'],
@@ -300,16 +308,19 @@ export const ORIENTAL = {
       'minhwa': { 
         ko: '민화', 
         en: 'Minhwa',
+        description: '민중의 소망을 담은 화려한 색채와 해학',
         aliases: ['korean minhwa', 'korean-minhwa', '한국 민화', '민화']
       },
       'pungsokdo': { 
         ko: '풍속도', 
         en: 'Pungsokdo',
+        description: '조선 서민의 일상을 생동감 있게 포착',
         aliases: ['korean pungsokdo', 'korean-pungsokdo', 'korean-genre', '풍속화', '한국 풍속도']
       },
       'jingyeong': { 
         ko: '진경산수화', 
         en: 'Jingyeong',
+        description: '실제 산수를 사실적으로 담아낸 조선의 풍경화',
         aliases: ['korean jingyeong', 'korean-jingyeong', '진경산수', '한국 진경산수화']
       }
     }
@@ -324,11 +335,13 @@ export const ORIENTAL = {
       'gongbi': { 
         ko: '공필화', 
         en: 'Gongbi',
+        description: '세밀한 필치와 화려한 채색의 궁정 회화',
         aliases: ['chinese gongbi', 'chinese-gongbi', '중국 공필화', '공필화']
       },
       'ink-wash': { 
         ko: '수묵화', 
         en: 'Ink Wash',
+        description: '먹의 농담으로 표현하는 동양 정신의 정수',
         aliases: ['chinese ink wash', 'chinese-ink', 'chinese-ink-wash', '중국 수묵화', '수묵화']
       }
     }
@@ -343,6 +356,7 @@ export const ORIENTAL = {
       'ukiyoe': { 
         ko: '우키요에', 
         en: 'Ukiyo-e',
+        description: '대담한 윤곽선과 평면적 색채의 목판화',
         aliases: ['japanese ukiyo-e', 'japanese-ukiyoe', 'ukiyo-e', '일본 우키요에', '우키요에']
       }
     }
@@ -355,11 +369,13 @@ export const MOVEMENT_ARTISTS = {
     'greek-sculpture': { 
       ko: '고대 그리스 조각', 
       en: 'Greek Sculpture',
+      description: '이상적 인체 비례와 균형잡힌 조형미',
       aliases: ['classical sculpture', 'polykleitos', 'phidias', 'myron', 'praxiteles', '그리스 조각']
     },
     'roman-mosaic': { 
       ko: '로마 모자이크', 
       en: 'Roman Mosaic',
+      description: '화려한 색채 조각으로 빚은 장식 예술',
       aliases: ['mosaic', '모자이크']
     }
   },
@@ -367,16 +383,19 @@ export const MOVEMENT_ARTISTS = {
     'byzantine': { 
       ko: '비잔틴', 
       en: 'Byzantine',
+      description: '금빛 배경과 신성한 도상의 종교 미술',
       aliases: ['byzantine art', '비잔틴 미술']
     },
     'gothic': { 
       ko: '고딕', 
       en: 'Gothic',
+      description: '섬세한 선과 수직적 상승의 경건함',
       aliases: ['gothic art', 'limbourg brothers', '고딕 미술', '랭부르 형제']
     },
     'islamic-miniature': { 
       ko: '이슬람 세밀화', 
       en: 'Islamic Miniature',
+      description: '정교한 문양과 화려한 색채의 세밀화',
       aliases: ['islamic', 'persian miniature', '페르시아 세밀화']
     }
   },
@@ -385,30 +404,35 @@ export const MOVEMENT_ARTISTS = {
       ko: '레오나르도 다 빈치', 
       en: 'Leonardo da Vinci', 
       years: '1452~1519',
+      description: '스푸마토 기법과 과학적 관찰의 완벽한 조화',
       aliases: ['da vinci', '다빈치', '레오나르도']
     },
     'michelangelo': { 
       ko: '미켈란젤로 부오나로티', 
       en: 'Michelangelo', 
       years: '1475~1564',
+      description: '역동적 인체 표현과 웅장한 스케일',
       aliases: ['michelangelo buonarroti', '미켈란젤로']
     },
     'raphael': { 
       ko: '라파엘로 산치오', 
       en: 'Raphael', 
       years: '1483~1520',
+      description: '조화로운 구도와 우아한 이상미',
       aliases: ['raphael sanzio', 'raffaello', '라파엘로']
     },
     'botticelli': { 
       ko: '산드로 보티첼리', 
       en: 'Botticelli', 
       years: '1445~1510',
+      description: '우아한 곡선과 신화적 아름다움',
       aliases: ['sandro botticelli', '보티첼리']
     },
     'titian': { 
       ko: '티치아노 베첼리오', 
       en: 'Titian', 
       years: '1488~1576',
+      description: '풍부한 색채와 관능적 질감 표현',
       aliases: ['tiziano', '티치아노']
     }
   },
@@ -417,30 +441,35 @@ export const MOVEMENT_ARTISTS = {
       ko: '미켈란젤로 메리시 다 카라바조', 
       en: 'Caravaggio', 
       years: '1571~1610',
+      description: '극적인 명암 대비와 사실적 긴장감',
       aliases: ['카라바조']
     },
     'rembrandt': { 
       ko: '렘브란트 판 레인', 
       en: 'Rembrandt', 
       years: '1606~1669',
+      description: '빛으로 드러나는 인간 내면의 깊이',
       aliases: ['rembrandt van rijn', '렘브란트']
     },
     'vermeer': { 
       ko: '요하네스 페르메이르', 
       en: 'Vermeer', 
       years: '1632~1675',
+      description: '고요한 일상 속 빛의 시학',
       aliases: ['johannes vermeer', 'jan vermeer', '페르메이르', '베르메르']
     },
     'velazquez': { 
       ko: '디에고 벨라스케스', 
       en: 'Velázquez', 
       years: '1599~1660',
+      description: '붓터치로 포착한 공기와 현실',
       aliases: ['velázquez', 'diego velázquez', '벨라스케스']
     },
     'rubens': { 
       ko: '피터 파울 루벤스', 
       en: 'Rubens', 
       years: '1577~1640',
+      description: '역동적 구도와 풍요로운 육체미',
       aliases: ['peter paul rubens', '루벤스']
     }
   },
@@ -449,18 +478,21 @@ export const MOVEMENT_ARTISTS = {
       ko: '장 앙투안 와토', 
       en: 'Watteau', 
       years: '1684~1721',
+      description: '우아한 연인들과 꿈결 같은 분위기',
       aliases: ['antoine watteau', 'jean-antoine watteau', '와토']
     },
     'boucher': { 
       ko: '프랑수아 부셰', 
       en: 'Boucher', 
       years: '1703~1770',
+      description: '감각적 색채와 화려한 장식미',
       aliases: ['françois boucher', 'francois boucher', '부셰']
     },
     'fragonard': { 
       ko: '장 오노레 프라고나르', 
       en: 'Fragonard', 
       years: '1732~1806',
+      description: '경쾌한 붓놀림과 로맨틱한 순간 포착',
       aliases: ['jean-honoré fragonard', '프라고나르']
     }
   },
@@ -469,12 +501,14 @@ export const MOVEMENT_ARTISTS = {
       ko: '자크 루이 다비드', 
       en: 'Jacques-Louis David', 
       years: '1748~1825',
+      description: '엄격한 구도와 고전적 영웅 서사',
       aliases: ['jacques-louis david', '다비드']
     },
     'ingres': { 
       ko: '장 오귀스트 도미니크 앵그르', 
       en: 'Ingres', 
       years: '1780~1867',
+      description: '매끄러운 선과 이상화된 인체 표현',
       aliases: ['jean-auguste-dominique ingres', '앵그르']
     }
   },
@@ -483,18 +517,21 @@ export const MOVEMENT_ARTISTS = {
       ko: '외젠 들라크루아', 
       en: 'Delacroix', 
       years: '1798~1863',
+      description: '격정적 색채와 드라마틱한 역동성',
       aliases: ['eugène delacroix', 'eugene delacroix', '들라크루아']
     },
     'turner': { 
       ko: '조지프 말러드 윌리엄 터너', 
       en: 'Turner', 
       years: '1775~1851',
+      description: '빛과 대기를 용해시킨 숭고한 자연',
       aliases: ['j.m.w. turner', 'joseph mallord william turner', 'william turner', '터너']
     },
     'goya': { 
       ko: '프란시스코 고야', 
       en: 'Goya', 
       years: '1746~1828',
+      description: '인간의 어둠과 광기를 파헤친 통찰',
       aliases: ['francisco goya', 'francisco de goya', '고야']
     }
   },
@@ -503,12 +540,14 @@ export const MOVEMENT_ARTISTS = {
       ko: '귀스타브 쿠르베', 
       en: 'Courbet', 
       years: '1819~1877',
+      description: '있는 그대로의 현실을 담담하게 직시',
       aliases: ['gustave courbet', '쿠르베']
     },
     'millet': { 
       ko: '장 프랑수아 밀레', 
       en: 'Millet', 
       years: '1814~1875',
+      description: '노동하는 농민의 숭고한 일상',
       aliases: ['jean-françois millet', 'jean-francois millet', '밀레']
     }
   },
@@ -517,36 +556,42 @@ export const MOVEMENT_ARTISTS = {
       ko: '클로드 모네', 
       en: 'Claude Monet', 
       years: '1840~1926',
+      description: '빛과 색의 순간적 인상을 포착',
       aliases: ['모네']
     },
     'renoir': { 
       ko: '피에르 오귀스트 르누아르', 
       en: 'Renoir', 
       years: '1841~1919',
+      description: '따스한 색감과 행복한 삶의 순간',
       aliases: ['pierre-auguste renoir', 'auguste renoir', '르누아르']
     },
     'degas': { 
       ko: '에드가 드가', 
       en: 'Degas', 
       years: '1834~1917',
+      description: '움직임의 순간과 파격적 구도',
       aliases: ['edgar degas', '드가']
     },
     'manet': { 
       ko: '에두아르 마네', 
       en: 'Manet', 
       years: '1832~1883',
+      description: '현대적 시선으로 포착한 도시 일상',
       aliases: ['édouard manet', 'edouard manet', '마네']
     },
     'morisot': { 
       ko: '베르트 모리조', 
       en: 'Morisot', 
       years: '1841~1895',
+      description: '부드러운 붓터치와 친밀한 일상의 시학',
       aliases: ['berthe morisot', '모리조']
     },
     'caillebotte': { 
       ko: '귀스타브 카유보트', 
       en: 'Caillebotte', 
       years: '1848~1894',
+      description: '대담한 원근법과 도시 풍경의 서정',
       aliases: ['gustave caillebotte', '카유보트']
     }
   },
@@ -555,18 +600,21 @@ export const MOVEMENT_ARTISTS = {
       ko: '빈센트 반 고흐', 
       en: 'Vincent van Gogh', 
       years: '1853~1890',
+      description: '소용돌이치는 붓터치와 강렬한 감정 표현',
       aliases: ['van gogh', 'gogh', '고흐', '반 고흐']
     },
     'gauguin': { 
       ko: '폴 고갱', 
       en: 'Paul Gauguin', 
       years: '1848~1903',
+      description: '원시적 색채와 이국적 상징의 세계',
       aliases: ['고갱']
     },
     'cezanne': { 
       ko: '폴 세잔', 
       en: 'Paul Cézanne', 
       years: '1839~1906',
+      description: '자연을 기하학적 형태로 재구성',
       aliases: ['cézanne', 'paul cézanne', '세잔']
     }
   },
@@ -575,18 +623,21 @@ export const MOVEMENT_ARTISTS = {
       ko: '앙리 마티스', 
       en: 'Henri Matisse', 
       years: '1869~1954',
+      description: '순수한 색채와 단순화된 형태의 기쁨',
       aliases: ['henri matisse', '마티스']
     },
     'derain': { 
       ko: '앙드레 드랭', 
       en: 'André Derain', 
       years: '1880~1954',
+      description: '대담한 원색과 자유로운 붓놀림',
       aliases: ['andré derain', 'andre derain', '드랭']
     },
     'vlaminck': { 
       ko: '모리스 드 블라맹크', 
       en: 'Maurice de Vlaminck', 
       years: '1876~1958',
+      description: '격렬한 색채와 거친 표현의 본능',
       aliases: ['maurice de vlaminck', '블라맹크']
     }
   },
@@ -595,18 +646,21 @@ export const MOVEMENT_ARTISTS = {
       ko: '에드바르 뭉크', 
       en: 'Edvard Munch', 
       years: '1863~1944',
+      description: '불안과 고독을 왜곡된 형상으로 표출',
       aliases: ['edvard munch', '뭉크']
     },
     'kirchner': { 
       ko: '에른스트 루트비히 키르히너', 
       en: 'Ernst Ludwig Kirchner', 
       years: '1880~1938',
+      description: '날카로운 선과 강렬한 색의 도시 풍경',
       aliases: ['ernst ludwig kirchner', '키르히너']
     },
     'kokoschka': { 
       ko: '오스카 코코슈카', 
       en: 'Oskar Kokoschka', 
       years: '1886~1980',
+      description: '격정적 붓터치로 드러낸 심리의 폭풍',
       aliases: ['oskar kokoschka', '코코슈카']
     }
   },
@@ -616,6 +670,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'Pablo Picasso', 
       years: '1881~1973', 
       sub: 'cubism',
+      description: '다시점으로 해체하고 재구성한 형태',
       aliases: ['pablo picasso', '피카소']
     },
     'lichtenstein': { 
@@ -623,6 +678,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'Roy Lichtenstein', 
       years: '1923~1997', 
       sub: 'popArt',
+      description: '만화적 점묘와 대중문화의 아이러니',
       aliases: ['roy lichtenstein', '리히텐슈타인']
     },
     'haring': { 
@@ -630,6 +686,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'Keith Haring', 
       years: '1958~1990', 
       sub: 'popArt',
+      description: '단순한 선과 역동적 인물의 그래피티',
       aliases: ['keith haring', '해링']
     },
     'miro': { 
@@ -637,6 +694,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'Joan Miró', 
       years: '1893~1983', 
       sub: 'surrealism',
+      description: '자유로운 기호와 유희적 색채의 우주',
       aliases: ['joan miró', 'joan miro', 'miró', '미로']
     },
     'magritte': { 
@@ -644,6 +702,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'René Magritte', 
       years: '1898~1967', 
       sub: 'surrealism',
+      description: '일상 속 낯선 조합으로 현실을 질문',
       aliases: ['rené magritte', 'rene magritte', '마그리트']
     },
     'chagall': { 
@@ -651,6 +710,7 @@ export const MOVEMENT_ARTISTS = {
       en: 'Marc Chagall', 
       years: '1887~1985', 
       sub: 'surrealism',
+      description: '꿈과 사랑이 떠다니는 환상의 세계',
       aliases: ['marc chagall', '샤갈']
     }
   }
@@ -1045,6 +1105,108 @@ export const getOrientalDisplayInfo = (artistName) => {
   return { title: '동양화', subtitle: artistName };
 };
 
+/**
+ * 스타일 부제 배열 가져오기 (3줄 표기용)
+ * @param {string} category - 'movements' | 'masters' | 'oriental'
+ * @param {string} styleId - 스타일 ID
+ * @param {string} mode - 모드:
+ *   - 'loading-single' : 단독 변환중
+ *   - 'loading-oneclick' : 원클릭 변환중-원본 (현행유지)
+ *   - 'loading-oneclick-preview' : 원클릭 변환중-완료 미리보기
+ *   - 'result-original' : 결과-원본 (변환중과 동일)
+ *   - 'result-transformed' : 결과-결과 (매칭 정보)
+ * @param {string} displayArtist - AI가 선택한 화가/스타일
+ * @param {string} displayWork - AI가 선택한 대표작 (거장용)
+ * @param {string} artistName - 거장 이름 (masters일 때)
+ * @returns {[string, string]} [부제1, 부제2]
+ */
+export const getStyleSubtitles = (category, styleId, mode, displayArtist, displayWork, artistName) => {
+  // 원클릭 변환중-원본 → 현행유지 (1줄만)
+  if (mode === 'loading-oneclick') {
+    return [null, null]; // 기존 방식 사용 signal
+  }
+  
+  // ===== 사조 =====
+  if (category === 'movements') {
+    const movement = findMovement(styleId);
+    
+    // 변환중 또는 결과-원본: 대표화가 + 사조 화풍
+    if (mode === 'loading-single' || mode === 'result-original') {
+      return [
+        movement?.subtitle || '',   // 부제1: 대표화가 (예: "모네 · 르누아르 · 드가")
+        movement?.description || '' // 부제2: 사조 화풍 (예: "빛의 순간을 포착")
+      ];
+    } 
+    // 결과-결과 또는 완료 미리보기: 매칭화가 + 매칭화가 화풍
+    else {
+      const artist = findArtistByName(displayArtist);
+      const artistDisplay = artist ? `${artist.ko}(${artist.en})` : displayArtist || '';
+      const artistStyle = artist?.description || movement?.description || '';
+      return [
+        artistDisplay,  // 부제1: 매칭화가
+        artistStyle     // 부제2: 매칭화가 화풍
+      ];
+    }
+  }
+  
+  // ===== 거장 =====
+  if (category === 'masters') {
+    const result = findMasterByNameOrWork(artistName || styleId, displayWork);
+    const master = result?.master;
+    
+    if (!master) {
+      return ['', ''];
+    }
+    
+    // 변환중 또는 결과-원본: 사조 + 화풍
+    if (mode === 'loading-single' || mode === 'result-original') {
+      return [
+        master.movement || '',     // 부제1: 사조 (예: "후기인상주의")
+        master.tagline || ''       // 부제2: 화풍
+      ];
+    }
+    // 결과-결과 또는 완료 미리보기: 대표작 2개 + 화풍
+    else {
+      return [
+        master.featuredWorks || '', // 부제1: 대표작 2개 (예: "별이 빛나는 밤 · 해바라기")
+        master.tagline || ''        // 부제2: 화풍
+      ];
+    }
+  }
+  
+  // ===== 동양화 =====
+  if (category === 'oriental') {
+    // displayArtist에서 국가/스타일 정보 추출
+    const result = findOrientalStyle(displayArtist || styleId);
+    
+    // 변환중 또는 결과-원본: 스타일들 + 국가 화풍
+    if (mode === 'loading-single' || mode === 'result-original') {
+      if (result?.country) {
+        const styleList = result.country.styles 
+          ? Object.values(result.country.styles).map(s => s.ko).join(' · ')
+          : '';
+        return [
+          styleList,                        // 부제1: 스타일들 (예: "민화 · 풍속도 · 진경산수화")
+          result.country.description || ''  // 부제2: 국가 화풍 (예: "여백과 절제의 미")
+        ];
+      }
+    } 
+    // 결과-결과 또는 완료 미리보기: 매칭 스타일 + 스타일 특징
+    else {
+      if (result?.style) {
+        return [
+          result.style.ko || '',                                      // 부제1: 매칭 스타일
+          result.style.description || result.country?.description || '' // 부제2: 스타일 특징
+        ];
+      }
+    }
+    
+    return ['', ''];
+  }
+  
+  return ['', ''];
+};
+
 // ========== 기본 export ==========
 export default {
   CATEGORY_ICONS,
@@ -1066,5 +1228,6 @@ export default {
   getEducationKey,
   getMovementDisplayInfo,
   getOrientalDisplayInfo,
+  getStyleSubtitles,
   getStyleSelectionArray
 };

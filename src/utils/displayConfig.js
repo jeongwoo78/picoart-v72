@@ -12,7 +12,7 @@
 // ========================================
 
 // v73: masterData에서 스타일 정보 import
-import { MOVEMENTS, ORIENTAL, MASTERS } from '../data/masterData';
+import { MOVEMENTS, ORIENTAL, MASTERS, getStyleSubtitles as getStyleSubtitlesFromMaster } from '../data/masterData';
 
 // ========================================
 // 1. 표준 키 목록
@@ -1005,6 +1005,9 @@ export function getStyleSubtitle(category, styleId, mode, displayArtist, artistN
   return '';
 }
 
+// v74: 3줄 표기용 부제 함수 re-export
+export const getStyleSubtitles = getStyleSubtitlesFromMaster;
+
 export default {
   STANDARD_KEYS,
   ALIASES,
@@ -1021,5 +1024,6 @@ export default {
   getCategoryIcon,
   getStyleIcon,
   getStyleTitle,
-  getStyleSubtitle
+  getStyleSubtitle,
+  getStyleSubtitles
 };

@@ -19,7 +19,7 @@ import { educationContent } from '../data/educationContent';
 import { saveToGallery } from './GalleryScreen';
 import { processStyleTransfer } from '../utils/styleTransferAPI';
 // v73: displayConfig 통합 함수
-import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
+import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getStyleIcon, getStyleTitle, getStyleSubtitle, getStyleSubtitles } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
 
 
@@ -1952,9 +1952,16 @@ const ResultScreen = ({
                   <div className="preview-style">
                     {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
                   </div>
-                  <div className="preview-subtitle">
-                    {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
-                  </div>
+                  {/* v74: 단독 원본 화면 3줄 표기 (result-original) */}
+                  {(() => {
+                    const [sub1, sub2] = getStyleSubtitles(selectedStyle?.category, selectedStyle?.id, 'result-original', null, null, selectedStyle?.name);
+                    return (
+                      <>
+                        {sub1 && <div className="preview-subtitle">{sub1}</div>}
+                        {sub2 && <div className="preview-subtitle sub2">{sub2}</div>}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -2030,18 +2037,20 @@ const ResultScreen = ({
                     return getStyleTitle(category, styleId, artistName);
                   })()}
                 </h2>
-                <p className="technique-subtitle">
-                  <span className="artist-name">
-                    {/* v73: 통합 함수 사용 */}
-                    {(() => {
-                      const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
-                      const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
-                      const artistName = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
-                      const mode = isFullTransform ? 'result-oneclick' : 'result-single';
-                      return getStyleSubtitle(category, styleId, mode, displayArtist, artistName);
-                    })()}
-                  </span>
-                </p>
+                {/* v74: 결과 3줄 표기 */}
+                {(() => {
+                  const category = isFullTransform ? currentResult?.style?.category : selectedStyle.category;
+                  const styleId = isFullTransform ? currentResult?.style?.id : selectedStyle?.id;
+                  const artistName = displayArtist || (isFullTransform ? currentResult?.style?.name : selectedStyle?.name);
+                  // v74: 결과-결과 모드 (result-transformed)
+                  const [sub1, sub2] = getStyleSubtitles(category, styleId, 'result-transformed', displayArtist, displayWork, artistName);
+                  return (
+                    <>
+                      {sub1 && <p className="technique-subtitle"><span className="artist-name">{sub1}</span></p>}
+                      {sub2 && <p className="technique-subtitle sub2"><span className="artist-name">{sub2}</span></p>}
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
@@ -2357,6 +2366,15 @@ const ResultScreen = ({
           align-items: center;
           gap: 0.75rem;
           flex-wrap: wrap;
+        }
+        
+        .technique-subtitle.sub2 {
+          margin-top: 0.15rem;
+        }
+        .technique-subtitle.sub2 .artist-name {
+          font-size: 0.95rem;
+          font-weight: 500;
+          color: #555;
         }
 
         .artist-name {
@@ -2728,6 +2746,11 @@ const ResultScreen = ({
           font-size: 0.95rem;
           color: #666;
           font-weight: 500;
+        }
+        .preview-card .preview-subtitle.sub2 {
+          font-size: 0.9rem;
+          color: #888;
+          margin-top: 4px;
         }
         .preview-card .edu-card {
           padding: 16px;

@@ -10,7 +10,7 @@ import { oneclickMovementsPrimary, oneclickMovementsSecondary } from '../data/on
 import { oneclickMastersPrimary, oneclickMastersSecondary } from '../data/oneclickMastersEducation';
 import { oneclickOrientalPrimary, oneclickOrientalSecondary } from '../data/oneclickOrientalEducation';
 // v73: displayConfig 통합 함수
-import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getCategoryIcon, getStyleIcon, getStyleTitle, getStyleSubtitle } from '../utils/displayConfig';
+import { normalizeKey, getDisplayInfo, getArtistName, getMovementDisplayInfo, getOrientalDisplayInfo, getMasterInfo, getCategoryIcon, getStyleIcon, getStyleTitle, getStyleSubtitle, getStyleSubtitles } from '../utils/displayConfig';
 import { getEducationKey, getEducationContent } from '../utils/educationMatcher';
 
 const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
@@ -639,7 +639,24 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                       <div className="preview-style">
                         {getTitle(previewResult)}
                       </div>
-                      <div className="preview-subtitle">{getSubtitle(previewResult)}</div>
+                      {/* v74: 원클릭 결과 미리보기 3줄 표기 (result-transformed) */}
+                      {(() => {
+                        const result = previewResult;
+                        const [sub1, sub2] = getStyleSubtitles(
+                          result?.style?.category,
+                          result?.style?.id,
+                          'result-transformed',
+                          result?.aiSelectedArtist,
+                          result?.selected_work,
+                          result?.style?.name
+                        );
+                        return (
+                          <>
+                            {sub1 && <div className="preview-subtitle">{sub1}</div>}
+                            {sub2 && <div className="preview-subtitle sub2">{sub2}</div>}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -712,9 +729,16 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
                   <div className="preview-style">
                     {getStyleTitle(selectedStyle?.category, selectedStyle?.id, selectedStyle?.name)}
                   </div>
-                  <div className="preview-subtitle">
-                    {getStyleSubtitle(selectedStyle?.category, selectedStyle?.id, 'loading', null, selectedStyle?.name)}
-                  </div>
+                  {/* v74: 단독 변환중 3줄 표기 */}
+                  {(() => {
+                    const [sub1, sub2] = getStyleSubtitles(selectedStyle?.category, selectedStyle?.id, 'loading-single', null, null, selectedStyle?.name);
+                    return (
+                      <>
+                        {sub1 && <div className="preview-subtitle">{sub1}</div>}
+                        {sub2 && <div className="preview-subtitle sub2">{sub2}</div>}
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -825,6 +849,12 @@ const ProcessingScreen = ({ photo, selectedStyle, onComplete }) => {
           font-size: 1.05rem; 
           font-weight: 600; 
           color: #222;
+        }
+        .preview-subtitle.sub2 {
+          font-size: 0.95rem;
+          font-weight: 500;
+          color: #555;
+          margin-top: 4px;
         }
         
         .dots-nav {
