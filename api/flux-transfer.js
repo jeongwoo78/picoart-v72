@@ -2472,12 +2472,12 @@ function buildIdentityPrompt(visionAnalysis) {
   // 민족성 (매우 중요!)
   if (visionAnalysis.ethnicity) {
     const ethnicityMap = {
-      'asian': 'ASIAN PERSON with East Asian facial bone structure, monolid or double eyelid eyes, warm golden-brown skin tone, dark brown eyes, straight black hair',
-      'caucasian': 'CAUCASIAN PERSON with European facial bone structure, light fair skin tone, defined nose bridge, varied eye colors',
-      'african': 'BLACK AFRICAN PERSON with DARK BROWN TO BLACK SKIN, African facial bone structure, broad nose, full lips, dark brown eyes, natural African hair texture',
-      'hispanic': 'HISPANIC/LATINO PERSON with Latin American features, warm tan to brown skin tone, dark eyes, dark hair, mestizo bone structure',
-      'middle_eastern': 'MIDDLE EASTERN/ARAB PERSON with olive to tan skin tone, Middle Eastern facial bone structure, dark eyes, dark hair, prominent nose bridge',
-      'mixed': 'MIXED ETHNICITY PERSON preserving original mixed heritage features, exact same skin tone as original'
+      'asian': 'ASIAN PERSON with East Asian facial features, warm skin tone, dark eyes',
+      'caucasian': 'CAUCASIAN PERSON with European facial features, light skin tone',
+      'african': 'AFRICAN PERSON with African facial features, dark skin tone, dark eyes',
+      'hispanic': 'HISPANIC/LATINO PERSON with Latin American features, tan to brown skin tone, dark eyes',
+      'middle_eastern': 'MIDDLE EASTERN PERSON with Middle Eastern facial features, olive to tan skin tone, dark eyes',
+      'mixed': 'MIXED ETHNICITY PERSON preserving original features and skin tone'
     };
     const ethnicDesc = ethnicityMap[visionAnalysis.ethnicity] || `${visionAnalysis.ethnicity} ethnicity`;
     parts.push(ethnicDesc);
@@ -3182,9 +3182,9 @@ export default async function handler(req, res) {
               genderPrefix = '';
             }
             
-            // v68: genderPrefix는 뒤에서 genderPrefixCommon으로 통합 처리
+            // v72.2: genderPrefix(인종/성별)를 앞으로 이동
             if (genderPrefix) {
-              finalPrompt = finalPrompt + ' ' + genderPrefix;
+              finalPrompt = genderPrefix + ' ' + finalPrompt;
             }
             logData.prompt.applied.gender = true;
             
@@ -3723,16 +3723,16 @@ export default async function handler(req, res) {
     }
 
     // ========================================
-    // v68: 대전제 + 성별 추가 (화풍+대표작 뒤에)
-    // 순서: [화풍 + 대표작] + [붓터치] + [대전제] + [성별] + [매력]
+    // v72.2: 성별/인종을 앞으로, 대전제는 뒤에
+    // 순서: [성별/인종] + [화풍 + 대표작] + [붓터치] + [대전제] + [매력]
     // ========================================
-    finalPrompt = finalPrompt + ' ' + coreRulesPrefix;
-    logData.prompt.applied.coreRules = true;
-    
     if (genderPrefixCommon) {
-      finalPrompt = finalPrompt + genderPrefixCommon;
+      finalPrompt = genderPrefixCommon + finalPrompt;
     }
     logData.prompt.applied.gender = true;
+    
+    finalPrompt = finalPrompt + ' ' + coreRulesPrefix;
+    logData.prompt.applied.coreRules = true;
     
     // ========================================
     // v68: 매력 조항 (간소화)
@@ -3745,25 +3745,7 @@ export default async function handler(req, res) {
     
     // ========================================
     // v72.1: 인종 보존 강화 (프롬프트 맨 앞에 삽입)
-    // African/Middle Eastern일 때 피부색 강력 강조
-    // ========================================
-    if (photoAnalysis && photoAnalysis.ethnicity) {
-      const ethnicity = photoAnalysis.ethnicity.toLowerCase();
-      if (ethnicity === 'african') {
-        // 1번: 맨 앞으로 + 2번: 반복 강조
-        finalPrompt = 'CRITICAL: BLACK PERSON DARK SKIN. ' + finalPrompt + ' DARK SKIN.';
-        logData.prompt.applied.ethnicityBoost = 'african';
-      } else if (ethnicity === 'middle_eastern') {
-        finalPrompt = 'CRITICAL: ARAB PERSON OLIVE TAN SKIN. ' + finalPrompt + ' OLIVE SKIN.';
-        logData.prompt.applied.ethnicityBoost = 'middle_eastern';
-      } else if (ethnicity === 'hispanic') {
-        finalPrompt = 'CRITICAL: LATINO PERSON TAN SKIN. ' + finalPrompt + ' TAN SKIN.';
-        logData.prompt.applied.ethnicityBoost = 'hispanic';
-      } else if (ethnicity === 'asian') {
-        finalPrompt = 'CRITICAL: ASIAN PERSON GOLDEN SKIN. ' + finalPrompt + ' ASIAN SKIN.';
-        logData.prompt.applied.ethnicityBoost = 'asian';
-      }
-    }
+    // v72.2: 샌드위치 제거 - ethnicityMap만 사용 (genderPrefix에서 앞에 적용됨)
     
     // ========================================
     // v68: 텍스트 금지 (서양화만)
