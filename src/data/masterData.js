@@ -321,7 +321,7 @@ export const ORIENTAL = {
         ko: '진경산수화', 
         en: 'Jingyeong',
         description: '실제 산수를 사실적으로 담아낸 조선의 풍경화',
-        aliases: ['korean jingyeong', 'korean-jingyeong', '진경산수', '한국 진경산수화']
+        aliases: ['korean jingyeong', 'korean-jingyeong', 'korean jingyeong landscape', '진경산수', '한국 진경산수화']
       }
     }
   },
