@@ -914,9 +914,27 @@ export const findOrientalStyle = (styleName) => {
   if (!styleName) return null;
   const normalized = styleName.toLowerCase().trim();
   
+  // 1단계: 스타일 매칭 먼저 (aliases 포함) - 사조/거장과 동일한 방식
   for (const [countryId, country] of Object.entries(ORIENTAL)) {
-    // 국가 이름으로 검색 (한국 전통회화, 중국 전통회화 등)
-    // 부분 매칭도 포함 (한국 전통화 → 한국 전통회화)
+    if (country.styles) {
+      for (const [styleId, style] of Object.entries(country.styles)) {
+        if (styleId === normalized ||
+            style.ko === styleName ||
+            style.en?.toLowerCase() === normalized ||
+            style.aliases?.some(a => a.toLowerCase() === normalized)) {
+          return { 
+            country, 
+            style, 
+            styleId,
+            key: `${countryId}-${styleId}`
+          };
+        }
+      }
+    }
+  }
+  
+  // 2단계: 스타일 매칭 실패 시 국가 매칭 (fallback)
+  for (const [countryId, country] of Object.entries(ORIENTAL)) {
     if (country.ko === styleName || 
         country.ko.includes(styleName) ||
         styleName.includes(country.ko) ||
@@ -936,24 +954,8 @@ export const findOrientalStyle = (styleName) => {
         key: `${countryId}-${firstStyleId}`
       };
     }
-    
-    // 스타일 이름으로 검색
-    if (country.styles) {
-      for (const [styleId, style] of Object.entries(country.styles)) {
-        if (styleId === normalized ||
-            style.ko === styleName ||
-            style.en?.toLowerCase() === normalized ||
-            style.aliases?.some(a => a.toLowerCase() === normalized)) {
-          return { 
-            country, 
-            style, 
-            styleId,
-            key: `${countryId}-${styleId}`  // 교육자료 키 형식
-          };
-        }
-      }
-    }
   }
+  
   return null;
 };
 

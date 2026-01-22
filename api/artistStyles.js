@@ -23,7 +23,7 @@ export const ARTIST_STYLES = {
   // ========================================
   'classical-sculpture': 'Ancient Greek-Roman marble sculpture style. Pure white Carrara marble with smooth polished surface, carved stone texture.',
   
-  'roman-mosaic': 'Roman floor mosaic style. Large visible tesserae tiles 50mm, thick black grout lines, earth tone palette.',
+  'roman-mosaic': 'Roman floor mosaic style. Large visible tesserae tiles 50mm, thick black grout lines, earth tone palette. Transform clothing to Roman toga or tunic with draped folds.',
 
   // ========================================
   // ⛪ 중세 
