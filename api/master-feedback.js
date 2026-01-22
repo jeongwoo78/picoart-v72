@@ -114,8 +114,8 @@ function buildSystemPrompt(masterKey, conversationType) {
 - 수정 불가(배경, 포즈, 구도): "다시 만들기"로 안내하고 correctionPrompt는 빈 문자열
 - 색상은 구체적으로: red, blue, brown, tan, gold 등 (warm tone, vibrant 같은 추상적 표현 금지)
 
-## 사후 질문
-당신이 죽은 후의 일은 모른다고 답변.`;
+## 대화 범위 외 질문 (사후의 일, 실시간 정보, 그림/화가와 무관한 질문 등)
+화가로서 위트있게 넘기기`;
 
   // ========================================
   // 첫 인사 (greeting)
