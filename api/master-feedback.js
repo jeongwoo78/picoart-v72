@@ -1,4 +1,8 @@
 // PicoArt - 거장(AI) 대화 API
+// v88: GPT-4o로 모델 변경 (Gemini Flash → GPT-4o)
+// - 페르소나 품질 향상
+// - 지시 따르기 개선
+// - 대화 자연스러움 향상
 // v87: 대화 품질 개선
 // - "~하면 어떨까?" → "~바꾸겠네" (이미 결정된 건 다시 안 물음)
 // - "버튼" → "'수정 요청' 버튼" (명확히)
@@ -6,7 +10,7 @@
 // - 추가 요청 시 합치기 규칙 추가
 // - "좋네" 과잉 사용 제거
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// OpenAI GPT-4o API
 
 // ========================================
 // 거장 페르소나 정의
@@ -239,38 +243,33 @@ const MASTER_PERSONAS = {
 };
 
 // ========================================
-// Gemini 2.0 Flash API 호출
+// GPT-4o API 호출
 // ========================================
-async function callGemini(messages, systemPrompt) {
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-  
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    systemInstruction: systemPrompt,
-    generationConfig: {
-      maxOutputTokens: 1024,
-      temperature: 0.7,
-    }
+async function callGPT4o(messages, systemPrompt) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ],
+      max_tokens: 1024,
+      temperature: 0.7
+    })
   });
   
-  // 대화 히스토리 변환 (OpenAI → Gemini 형식)
-  const history = messages.slice(0, -1).map(msg => ({
-    role: msg.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: msg.content }]
-  }));
-  
-  // 마지막 메시지 (현재 사용자 입력)
-  const lastMessage = messages[messages.length - 1]?.content || '';
-  
-  // 히스토리가 있으면 채팅 모드, 없으면 단일 생성
-  if (history.length > 0) {
-    const chat = model.startChat({ history });
-    const result = await chat.sendMessage(lastMessage);
-    return result.response.text();
-  } else {
-    const result = await model.generateContent(lastMessage);
-    return result.response.text();
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`OpenAI API error: ${error.error?.message || 'Unknown error'}`);
   }
+  
+  const data = await response.json();
+  return data.choices[0].message.content;
 }
 
 // ========================================
@@ -928,7 +927,7 @@ export default async function handler(req, res) {
     const systemPrompt = buildSystemPrompt(masterName, conversationType);
     
     // 디버그 로그
-    console.log('=== Master Feedback API v77 (Gemini 2.0 Flash) ===');
+    console.log('=== Master Feedback API v88 (GPT-4o) ===');
     console.log('masterName:', masterName);
     console.log('conversationType:', conversationType);
     console.log('persona:', persona.nameKo);
@@ -951,10 +950,10 @@ export default async function handler(req, res) {
       messages = [{ role: 'user', content: '수정이 완료되었습니다. 결과를 전달해주세요.' }];
     }
 
-    // Gemini 2.0 Flash 호출
-    const response = await callGemini(messages, systemPrompt);
+    // GPT-4o 호출
+    const response = await callGPT4o(messages, systemPrompt);
     
-    console.log('Gemini Response:', response);
+    console.log('GPT-4o Response:', response);
 
     // 응답 파싱 및 반환
     if (conversationType === 'feedback') {
